@@ -13,11 +13,18 @@ Components
 * ...
 
 
+Files and directory
+-------------------
+
+* **lapp** : for **l**amp **app**, python module that contains all user defined programs
+* todo...
+
+
 TODO
 ----
 * manage start/stop/status for lamp app (API)
  * only one app may be running at a time
- * how to manage stdout/stderr ?
+ * stdout/stderr are stored in : "lapp_data/<lapp_name>/start_time/<PID>.{strout, strerr}"
 * manage list/new/get/update for lamp app (API)
- * which "database" for lamp app meta data ?
+ * no "database": all metadata are in .py files (module docstring + __author__ + __date__ * ...)
 * add blocly interface
