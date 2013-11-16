@@ -24,7 +24,7 @@ TODO
 ----
 * manage start/stop/status for lamp app (API)
  * only one app may be running at a time
- * stdout/stderr are stored in : "lapp_data/<lapp_name>/start_time/<PID>.{strout, strerr}"
+ * stdout/stderr are stored in : "lapp_data/**lapp_name**/**start_time**/**PID**.{stdout, stderr}"
 * manage list/new/get/update for lamp app (API)
  * no "database": all metadata are in .py files (module docstring + __author__ + __date__ * ...)
 * add blocly interface
