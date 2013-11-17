@@ -31,8 +31,17 @@ Lamp app
 
 Exemple:
 ```python
+import time
+
+from lapp import LampApp
+
 class MyLampApp(LampApp);
-   pass
+    def setup(self):
+        pass
+
+    def loop(self):
+        pass
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     lapp = MyLampApp()
@@ -43,13 +52,28 @@ if __name__ == "__main__":
 Lamp App web editor/manager
 ---------------------------
 
+* create a new lapp
+* edit a lapp directly in python
+* edit a lapp with blockly
+* delete a lapp
+* run a lapp
+* stop the running lapp
+* view which lapp is running (if any)
+* view running lapp log (std+err), in live
+* view last run(s) log (std+err)
+* set a lapp to be run on startup
+
+
+
 * no "database": all metadata are in .py files (module docstring + __author__ + __date__ * ...)
 * stdout/stderr are stored in : "lapp_data/**lapp_name**/**start_time**/**PID**.{stdout, stderr}"
+
+To edit a code in a browser: http://ace.c9.io/
 
 
 TODO
 ----
 
-- [ ] manage start/stop/status for lamp app (API)
-- [ ] manage list/new/get/update for lamp app (API)
-- [ ] add blocly interface
+- manage start/stop/status for lamp app (API)
+- manage list/new/get/update for lamp app (API)
+- add blocly interface
