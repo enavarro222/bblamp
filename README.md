@@ -20,11 +20,36 @@ Files and directory
 * todo...
 
 
+Lamp app
+--------
+
+* could be written using blockly
+* autonomous python program
+* only one running at a time
+* may be run as a service
+* extends a class, that help
+
+Exemple:
+```python
+class MyLampApp(LampApp);
+   pass
+
+if __name__ == "__main__":
+    lapp = MyLampApp()
+    lapp.run()
+
+```
+
+Lamp App web editor/manager
+---------------------------
+
+* no "database": all metadata are in .py files (module docstring + __author__ + __date__ * ...)
+* stdout/stderr are stored in : "lapp_data/**lapp_name**/**start_time**/**PID**.{stdout, stderr}"
+
+
 TODO
 ----
-* manage start/stop/status for lamp app (API)
- * only one app may be running at a time
- * stdout/stderr are stored in : "lapp_data/**lapp_name**/**start_time**/**PID**.{stdout, stderr}"
-* manage list/new/get/update for lamp app (API)
- * no "database": all metadata are in .py files (module docstring + __author__ + __date__ * ...)
-* add blocly interface
+
+- [ ] manage start/stop/status for lamp app (API)
+- [ ] manage list/new/get/update for lamp app (API)
+- [ ] add blocly interface
