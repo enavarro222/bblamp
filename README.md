@@ -9,15 +9,20 @@ Components
 ----------
 
 * Rasbperry Pi
-* 12mm LedPixels (string of 25)
-* ...
+* string of 25 12mm LedPixels (SPI port)
+* light sensor (I2C)
+* DHT22 
+* push button
+* PIR sensor
+* small mic
+* small speakers
 
 
 Files and directory
 -------------------
 
 * **lapp** : for **l**amp **app**, python module that contains all user defined programs
-* todo...
+* todo
 
 
 Lamp app
@@ -74,6 +79,8 @@ To edit a code in a browser: http://ace.c9.io/
 TODO
 ----
 
-- manage start/stop/status for lamp app (API)
-- manage list/new/get/update for lamp app (API)
-- add blocly interface
+* manage stdin/stdout and logging (API and Lapp)
+* 
+* manage start/stop/status for lamp app (API)
+* manage list/new/get/update for lamp app (API)
+* add blocly interface
