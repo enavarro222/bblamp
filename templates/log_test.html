@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Logging test page</title>
+    </head>
+    <body>
+        <h1>Logging test page (erver sent events)</h1>
+        <ul>
+            <li><a href="{{ url_for('log_debug') }}">How many sucribers ?</a></li>
+            <li><a href="{{ url_for('log_publish') }}">Publish new data !</a></li>
+        </ul>
+        <div id="event"></div>
+
+        <script type="text/javascript">
+
+        var eventOutputContainer = document.getElementById("event");
+        var evtSrc = new EventSource("/log/subscribe");
+
+        evtSrc.onmessage = function(e) {
+         console.log(e.data);
+         eventOutputContainer.innerHTML = e.data + "<br />" + eventOutputContainer.innerHTML;
+        };
+
+        </script>
+    </body>
+ </html>

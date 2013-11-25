@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>BBLamp</title>
+    </head>
+    <body>
+        <h1>BBLamp main page</h1>
+        <ul>
+            <li><a href="{{ url_for('lapp_run', lapp_name='test') }}">Run test lapp</a></li>
+            <li><a href="{{ url_for('lapp_stop') }}">Stop lapp !</a></li>
+            <li><a href="{{ url_for('lapp_status') }}">Status ?</a></li>
+        </ul>
+        <div id="event"></div>
+
+        <script type="text/javascript">
+
+        var eventOutputContainer = document.getElementById("event");
+        var evtSrc = new EventSource("/log/subscribe");
+
+        evtSrc.onmessage = function(e) {
+         console.log(e.data);
+         eventOutputContainer.innerHTML = e.data + "<br />" + eventOutputContainer.innerHTML;
+        };
+
+        </script>
+    </body>
+ </html>
