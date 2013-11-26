@@ -1,10 +1,7 @@
 #-*- coding:utf-8 -*-
-
 import time
 
 from lapp import LampApp
-
-import os
 
 class MyLampApp(LampApp):
 
@@ -12,6 +9,7 @@ class MyLampApp(LampApp):
         self.on = False
 
     def loop(self):
+        self.msg("Blink !")
         if self.on:
             self.lamp.all_off()
         else:

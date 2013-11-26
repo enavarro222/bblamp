@@ -14,17 +14,20 @@
 # http://blog.scphillips.com/2013/07/getting-a-python-script-to-run-in-the-background-as-a-service-on-boot/
 
 DAEMON_NAME=lapp
-DIR=/home/pi/bblamp
-STDOUT=$DIR/${DAEMON_NAME}.stdout
-STDERR=$DIR/${DAEMON_NAME}.stderr
+DIR=/home/navarro/workspace/bblamp
+STDOUT=$DIR/lapp_output/${DAEMON_NAME}.stdout
+LOGFILE=$DIR/lapp_output/${DAEMON_NAME}.log
+
 DAEMON_CMD=$DIR/lapp/lapp_running.py
+
  
 # This next line determines what user the script runs as.
 # Root generally not recommended but necessary if you are using the Raspberry Pi GPIO from Python.
-DAEMON_USER=pi
- 
+#DAEMON_USER=pi
+DAEMON_USER=navarro
+
 # The process ID of the script when it runs is stored here:
-PIDFILE=$DIR/${DAEMON_NAME}.pid
+PIDFILE=$DIR/lapp_output/${DAEMON_NAME}.pid
 
 # var env
 export PYTHONPATH=$PYTHONPATH:./
@@ -33,8 +36,7 @@ export PYTHONPATH=$PYTHONPATH:./
  
 do_start () {
 	log_daemon_msg "Starting system $DAEMON_NAME daemon"
-	echo 
-	echo "start-stop-daemon --start --background --pidfile $PIDFILE --exec "/usr/bin/python" --user ${DAEMON_USER} --chdir $DIR  -- ${DAEMON_CMD} > $STDOUT 2> $STDERR"
+	start-stop-daemon --start --background --pidfile $PIDFILE --exec "/usr/bin/python" --user ${DAEMON_USER} --chdir $DIR  -- ${DAEMON_CMD} --pidfile $PIDFILE --outfile $STDOUT --logfile $LOGFILE
 	log_end_msg $?
 }
 do_stop () {
