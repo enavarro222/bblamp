@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 import os
+from datetime import datetime
 
 def pid_is_running(pid):
     """
@@ -19,13 +20,40 @@ def pid_is_running(pid):
     else:
         return pid
 
-def write_pidfile_or_die(path_to_pidfile):
-    if os.path.exists(path_to_pidfile):
-        pid = int(open(path_to_pidfile).read())
-        if pid_is_running(pid):
-            print("Sorry, found a pidfile!  Process {0} is still running.".format(pid))
-            raise SystemExit
-        else:
-            os.remove(path_to_pidfile)
-    open(path_to_pidfile, 'w').write(str(os.getpid()))
-    return path_to_pidfile
+def read_lapp_pidfile(pidfile):
+    """ Return a dict containing info about the lapp running with the given pid
+    file, None if no such file or if the lapp isn't running.
+    """
+    ret = {}
+    if os.path.exists(pidfile):
+        with open(pidfile, "r") as pidf:
+            try:
+                pid = int(pidf.readline().strip())
+                if pid_is_running(pid):
+                    ret["pid"] = pid
+                    ret["script_name"] = pidf.readline().strip()
+                    ret["script_dir"] = pidf.readline().strip()
+                    ret["start_time"] = pidf.readline().strip()
+                else:
+                    ret = None
+            except ValueError:
+                ret = None
+    else:
+        ret = None
+    return ret
+
+def write_lapp_pidfile(pidfile):
+    """ Write info about the currently running lapp in a pidfile.
+    """
+    with open(pidfile, "w") as pidf:
+        # pid
+        pidf.write("%s\n" % os.getpid())
+        import __main__
+        main_name = __main__.__file__
+        # script name
+        pidf.write("%s\n" % os.path.basename(main_name))
+        # dir name
+        pidf.write("%s\n" % os.path.dirname(os.path.abspath(main_name)))
+        # start time
+        pidf.write("%s\n" % datetime.now().isoformat())
+

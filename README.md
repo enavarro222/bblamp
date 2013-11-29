@@ -69,18 +69,22 @@ Lamp App web editor/manager
 * set a lapp to be run on startup
 
 
-
 * no "database": all metadata are in .py files (module docstring + __author__ + __date__ * ...)
-* stdout/stderr are stored in : "lapp_data/**lapp_name**/**start_time**/**PID**.{stdout, stderr}"
-
-To edit a code in a browser: http://ace.c9.io/
+* stdout/stderr/status are stored in files ine : "lapp_out"
 
 
 TODO
 ----
 
-* manage stdin/stdout and logging (API and Lapp)
-* 
-* manage start/stop/status for lamp app (API)
+* test i2c sensors
+* fix issue with GPIO not as root
+* how to do with interupt ?
+* manage start on boot
+* basic HTML/JS interface
 * manage list/new/get/update for lamp app (API)
+    Note: To edit a code in a browser: http://ace.c9.io/
+* add python editor on interface
 * add blocly interface
+* make hardware changeable (pygame, html/js, texte)
+
+

@@ -23,6 +23,7 @@ class LedPixels():
         self._spidev.flush()
 
     def set_color(self, lnum, r, g, b):
+        assert 0 <= lnum < self._nb_pixel
         rgb = self.colors[lnum]
         rgb[0] = r
         rgb[1] = g

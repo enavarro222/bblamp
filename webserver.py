@@ -1,10 +1,9 @@
 #!/usr/bin/python
 #-*- coding:utf-8 -*-
-import subprocess
-import sys
 import os
-import signal
-import time
+import sys
+import json
+import subprocess
 
 # Make sure your gevent version is >= 1.0
 import gevent
@@ -14,13 +13,21 @@ from gevent.queue import Queue
 from flask import Flask, Response
 from flask import render_template, jsonify
 
+from utils import read_lapp_pidfile
+
 # the Flask app
-app = Flask(__name__)
-app.debug = True
+bblamp_app = Flask(__name__)
+bblamp_app.debug = True
 
 # app constants
-LOG_PID_PATH = "running_prog.pid"
-LAPP_BASEDIR = "./lapp/"
+BASEDIR = os.path.dirname(os.path.abspath(__file__))
+LAPP_DIR = os.path.join(BASEDIR, "lapp/")
+#LAPP_USER = "navarro"
+LAPP_USER = "pi"
+LAPP_OUTDIR = os.path.join(BASEDIR, "lapp_output/")
+LAPP_OUTFILE = os.path.join(LAPP_OUTDIR, "lapp.stdout")
+LAPP_LOGFILE = os.path.join(LAPP_OUTDIR, "lapp.log")
+LAPP_PIDFILE = os.path.join(LAPP_OUTDIR, "lapp.pid")
 
 # app shared state variables
 subscriptions = []
@@ -89,7 +96,18 @@ class LappDoNotExist(BBLampException):
         self.data["lapp_name"] = lapp_name
 
 
-@app.errorhandler(BBLampException)
+class LappRunning(BBLampException):
+    def __init__(self, lapp_info):
+        message = "A lamp app is already running"
+        BBLampException.__init__(self, message)
+        self.data.update(lapp_info)
+
+class LappNotRunning(BBLampException):
+    def __init__(self):
+        message = "No lamp app running"
+        BBLampException.__init__(self, message)
+
+@bblamp_app.errorhandler(BBLampException)
 def handle_invalid_lapp_name(error):
     """ BBLampException handler
     """
@@ -100,8 +118,11 @@ def handle_invalid_lapp_name(error):
 #-------------------------------------------------------------------------------
 # lapp_name helper
 def _lapp_valid_name(lapp_name):
-    """ check wheter it is a valid lamp app name
+    """ Check wheter it is a valid lamp app name
+
+    Warning: do not check if the lapp exist or not.
     """
+    # check name is corect
     if lapp_name.startswith("_"):
         raise InvalidLappName(
             "lapp name shouldn't starts with '_'",
@@ -110,15 +131,20 @@ def _lapp_valid_name(lapp_name):
     return True
 
 def _lappname_to_filname(lapp_name):
+    """ Get the python script filename from a given lapp name
+    """
     _lapp_valid_name(lapp_name)
-    return os.path.join(LAPP_BASEDIR, lapp_name + ".py")
+    return os.path.join(LAPP_DIR, lapp_name + ".py")
 
 def _lapp_exist(lapp_name):
     """ check wheter a lamp app exist or not
     """
     return os.path.isfile(_lappname_to_filname(lapp_name))
 
-@app.route("/lapp/new/<lapp_name>")
+#-------------------------------------------------------------------------------
+# lapp API
+
+@bblamp_app.route("/lapp/new/<lapp_name>")
 def new_program(lapp_name):
     """ create a new program
     """
@@ -130,10 +156,7 @@ def new_program(lapp_name):
     open(_lappname_to_filname(lapp_name), 'a').close()
     return jsonify(output)
 
-#-------------------------------------------------------------------------------
-# lapp API
-
-@app.route("/lapp/get/<lapp_name>")
+@bblamp_app.route("/lapp/get/<lapp_name>")
 def get_program(lapp_name):
     """ get the code of a program
     """
@@ -148,113 +171,113 @@ def get_program(lapp_name):
     #TODO
     return jsonify(output)
 
-
-@app.route("/lapp/list")
+@bblamp_app.route("/lapp/list")
 def list_program():
     """ list all avaliable lamp apps
     """
     #TODO
     pass
 
-
 #-------------------------------------------------------------------------------
 # lapp ctrl API
 
-@app.route("/ctrl/run/<lapp_name>")
+@bblamp_app.route("/ctrl/run/<lapp_name>")
 def lapp_run(lapp_name):
     """ Run a given lapp
     """
     # check name ok
     _lapp_valid_name(lapp_name)
-    # check program exist
-    #TODO better check : if file but no process
-    if(os.path.isfile(LOG_PID_PATH) == True):
-        #XXX : gestion de l'erreur non uniforme
-        return "program already running"
+    #check program exist
+    if not _lapp_exist(lapp_name):
+        raise LappDoNotExist(lapp_name)
+    # check nothing running
+    lapp_info = read_lapp_pidfile(LAPP_PIDFILE)
+    if lapp_info is not None:
+        raise LappRunning(lapp_info)
+    # start daemon
+    lapp_py = _lappname_to_filname(lapp_name)
+    cmd = ["start-stop-daemon", "--start"]
+    cmd += ["--background"] #comment it for debug
+    cmd += ["--pidfile", LAPP_PIDFILE]
+    cmd += ["--exec", "/usr/bin/python"]
+    cmd += ["--user", "%s" % LAPP_USER]
+    cmd += ["--chdir", "%s" % BASEDIR]
+    cmd += ["--", "%s" % lapp_py]
+    cmd += ["--pidfile", "%s" % LAPP_PIDFILE]
+    cmd += ["--outfile", "%s" % LAPP_OUTFILE]
+    cmd += ["--logfile", "%s" % LAPP_LOGFILE]
+    #print(cmd)
+    #print(" ".join(cmd))
+    # setup python path
+    varenv = os.environ.copy()
+    varenv["PYTHONPATH"] = varenv.get("PYTHONPATH", "") + ":./"
     # run the program
-    with open(LOG_PID_PATH, "w") as pid_file:
-        lapp_py = _lappname_to_filname(lapp_name)
-        print "starting log process: ", lapp_py
-        proc = subprocess.Popen(
-                ["python", "%s" % lapp_py],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                #shell=True,
-                #preexec_fn=os.setsid
-            )
-        pid = proc.pid
-        pid_file.write("%s\n" % (pid))
-        pid_file.write("%s\n" % (lapp_name))
-        pid_file.write("%s\n" % (lapp_py))
-    # return
-    #TODO json
-    return "done:%d" % pid
+    proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=varenv
+        )
+    output, error = proc.communicate()
+    #print output
+    #print error
+    retcode = proc.poll()
+    if retcode != 0:
+        raise RuntimeError(error)
+    #TODO update status (msg)
+    ## check what running (if any)
+    ## send msg
+    return "done"
 
-@app.route("/ctrl/stop")
+@bblamp_app.route("/ctrl/stop")
 def lapp_stop():
     """ Stop the curently running lapp (if any)
     """
-    if(os.path.isfile(LOG_PID_PATH) != True):
-        #XXX : gestion de l'erreur non uniforme
-        return "log process not started, can not find file: %s" % LOG_PID_PATH, 500
-    # stop the program
-    with open(LOG_PID_PATH, "r") as pid_file:
-        try:
-            pid = int(pid_file.readline())
-        except ValueError:
-            #XXX log error
-            subprocess.call("rm " + LOG_PID_PATH, shell=True)
-            pid = None
-    
-    print "pid = ", pid
-    if pid is not None:
-        try:
-            os.killpg(pid, signal.SIGTERM) #kill process group
-        except OSError as os_err:
-            if os_err.errno == 3: # No such process
-                print("PID file not up to date, removing it !")
-                pass
-            else:
-                raise
-        finally:
-            subprocess.call("rm " + LOG_PID_PATH, shell=True)
-    
-    #TODO json
+    # check nothing running
+    lapp_info = read_lapp_pidfile(LAPP_PIDFILE)
+    if lapp_info is None:
+        raise LappNotRunning()
+    # stop the lapp daemon
+    cmd = ["start-stop-daemon", "--stop"]
+    cmd += ["--pidfile", LAPP_PIDFILE]
+    #print(cmd)
+    #print(" ".join(cmd))
+    proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+    output, error = proc.communicate()
+    retcode = proc.poll()
+    if retcode != 0:
+        raise RuntimeError(error)
     return "done"
 
-@app.route("/ctrl/status")
-def lapp_status():
+def get_lapp_status():
+    """ Return the status of the running lapp
+    """
     output = {}
-    if(os.path.isfile(LOG_PID_PATH) != True):
-        output["status"] = "stopped"
-    else:
-        with open(LOG_PID_PATH, "r") as pid_file:
-            output["pid"] = int(pid_file.readline())
-            output["lapp_name"] = pid_file.readline().strip()
-            output["lapp_py"] = pid_file.readline().strip()
-        #TODO: check process really running
+    output["status"] = "stopped"
+    lappinfo = read_lapp_pidfile(LAPP_PIDFILE)
+    if lappinfo is not None:
+        output.update(lappinfo)
         output["status"] = "running"
-    
-    return jsonify(output)
+    return output
+
+@bblamp_app.route("/ctrl/status")
+def lapp_status():
+    """ Return the status of the running lapp (json data)
+    """
+    return jsonify(get_lapp_status())
 
 #-------------------------------------------------------------------------------
 # lapp log API (push)
 
-@app.route("/log/debug")
+@bblamp_app.route("/log/debug")
 def log_debug():
     return "Currently %d subscriptions" % len(subscriptions)
 
-@app.route("/log/publish")
-def log_publish():
-    #Dummy data - pick up from request for real data
-    def notify():
-        msg = str(time.time())
-        send_logline(msg)
-    
-    gevent.spawn(notify)
-    return "OK"
-
-@app.route("/log/subscribe")
+@bblamp_app.route("/log/subscribe")
 def log_subscribe():
     def gen():
         q = Queue()
@@ -269,36 +292,90 @@ def log_subscribe():
 
     return Response(gen(), mimetype="text/event-stream")
 
-def send_logline(logline):
+def send_data(dtype, data):
+    """ Send data to the clients
+    """
+    output = {
+        "dtype": dtype,
+        "data": data
+    }
     for sub in subscriptions[:]:
-        print("msg sent : %s" % logline)
-        sub.put(logline)
+        print("%s : %s" % (dtype, data))
+        sub.put(json.dumps(output))
 
-def monitor_logfile():
-    with open("./inputfile") as in_file:
-        #except serial.SerialException, e:
-        #     yield 'event:error\n' + 'data:' + 'Serial port error({0}): {1}\n\n'.format(e.errno, e.strerror)
-        #     messageid = messageid + 1
-        while True:
-            gevent.sleep(0.1)
-            nextline = in_file.readline()
-            if nextline:
-                send_logline(nextline)
+def new_lapp_output(msg):
+    send_data("output", msg)
+
+def new_lapp_logmsg(msg):
+    send_data("log", msg)
+
+def new_lapp_status():
+    send_data("status", get_lapp_status())
+
+def monitor_logging_file(filename, output_fct):
+    """ pseudo therad (gevent) that monitor a log file
+    """
+    while True:
+        try:
+            with open(filename, "r") as in_file:
+                #seek to the end
+                # in order to not send all already in the file lines
+                in_file.seek(0, os.SEEK_END)
+                while True:
+                    # check the file still exist
+                    # cf: http://stackoverflow.com/a/12690767
+                    if os.fstat(in_file.fileno()).st_nlink == 0:
+                        break
+                    # try to read next line
+                    nextline = in_file.readline()
+                    if nextline:
+                        output_fct(nextline)
+                    # wait some time
+                    gevent.sleep(0.1)
+        except IOError as error:
+            # file doesn't exist or not
+            if error.errno == 2:
+                #TODO: add logging
+                gevent.sleep(1)
+            else:
+                raise
+
+def monitor_lapp_logfile():
+    monitor_logging_file(LAPP_LOGFILE, new_lapp_logmsg)
+
+def monitor_lapp_outfile():
+    monitor_logging_file(LAPP_OUTFILE, new_lapp_output)
+
+def monitor_lapp_status():
+    while True:
+        last_status = get_lapp_status()
+        while last_status == get_lapp_status():
+                gevent.sleep(0.4)
+        new_lapp_status()
+        gevent.sleep(0.4)
 
 #-------------------------------------------------------------------------------
 # single page app getter
-@app.route("/")
-def main():
+@bblamp_app.route("/")
+def main_page():
     return render_template("index.html")
 
-@app.route("/ltest")
+@bblamp_app.route("/ltest")
 def logging_test():
     return render_template("log_test.html")
 
-if __name__ == "__main__":
+#-------------------------------------------------------------------------------
+def main():
     print("<run>")
-    log_worker = gevent.spawn(monitor_logfile)
-    server = WSGIServer(("0.0.0.0", 5000), app)
+    # file monitoring
+    monitor_log_worker = gevent.spawn(monitor_lapp_logfile)
+    monitor_output_worker = gevent.spawn(monitor_lapp_outfile)
+    monitor_status_worker = gevent.spawn(monitor_lapp_status)
+    # web server
+    server = WSGIServer(("0.0.0.0", 5000), bblamp_app)
     server.serve_forever()
     print("<run_done>")
+    return 0
 
+if __name__ == "__main__":
+    sys.exit(main())
