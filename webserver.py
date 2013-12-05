@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import subprocess
+import glob
 
 # Make sure your gevent version is >= 1.0
 import gevent
@@ -22,8 +23,8 @@ bblamp_app.debug = True
 # app constants
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 LAPP_DIR = os.path.join(BASEDIR, "lapp/")
-#LAPP_USER = "navarro"
-LAPP_USER = "pi"
+LAPP_USER = "navarro"
+#LAPP_USER = "pi"
 LAPP_OUTDIR = os.path.join(BASEDIR, "lapp_output/")
 LAPP_OUTFILE = os.path.join(LAPP_OUTDIR, "lapp.stdout")
 LAPP_LOGFILE = os.path.join(LAPP_OUTDIR, "lapp.log")
@@ -78,12 +79,14 @@ class BBLampException(Exception):
 
 class InvalidLappName(BBLampException):
     def __init__(self, message, lapp_name=None):
+        self.status_code = 406 #Not Acceptable
         BBLampException.__init__(self, message)
         self.data["lapp_name"] = lapp_name
 
 
 class LappAlreadyExist(BBLampException):
     def __init__(self, lapp_name):
+        self.status_code = 406
         message = "Lamp app '%s' already exist" % lapp_name
         BBLampException.__init__(self, message)
         self.data["lapp_name"] = lapp_name
@@ -91,6 +94,7 @@ class LappAlreadyExist(BBLampException):
 
 class LappDoNotExist(BBLampException):
     def __init__(self, lapp_name):
+        self.status_code = 404 # Not Found
         message = "Lamp app '%s' doesn't exist" % lapp_name
         BBLampException.__init__(self, message)
         self.data["lapp_name"] = lapp_name
@@ -98,14 +102,18 @@ class LappDoNotExist(BBLampException):
 
 class LappRunning(BBLampException):
     def __init__(self, lapp_info):
+        self.status_code = 406
         message = "A lamp app is already running"
         BBLampException.__init__(self, message)
         self.data.update(lapp_info)
 
+
 class LappNotRunning(BBLampException):
     def __init__(self):
+        self.status_code = 406
         message = "No lamp app running"
         BBLampException.__init__(self, message)
+
 
 @bblamp_app.errorhandler(BBLampException)
 def handle_invalid_lapp_name(error):
@@ -116,67 +124,140 @@ def handle_invalid_lapp_name(error):
     return response
 
 #-------------------------------------------------------------------------------
-# lapp_name helper
-def _lapp_valid_name(lapp_name):
-    """ Check wheter it is a valid lamp app name
-
-    Warning: do not check if the lapp exist or not.
-    """
-    # check name is corect
-    if lapp_name.startswith("_"):
-        raise InvalidLappName(
-            "lapp name shouldn't starts with '_'",
-            lapp_name=lapp_name
-        )
-    return True
-
-def _lappname_to_filname(lapp_name):
-    """ Get the python script filename from a given lapp name
-    """
-    _lapp_valid_name(lapp_name)
-    return os.path.join(LAPP_DIR, lapp_name + ".py")
-
-def _lapp_exist(lapp_name):
-    """ check wheter a lamp app exist or not
-    """
-    return os.path.isfile(_lappname_to_filname(lapp_name))
-
-#-------------------------------------------------------------------------------
 # lapp API
 
-@bblamp_app.route("/lapp/new/<lapp_name>")
-def new_program(lapp_name):
-    """ create a new program
-    """
-    output = {}
-    # check doesn't already exist
-    if _lapp_exist(lapp_name):
-        raise LappAlreadyExist(lapp_name)
-    # create the new file
-    open(_lappname_to_filname(lapp_name), 'a').close()
-    return jsonify(output)
+#TODO:
+# create a new lapp
+# update a lapp
+# get a lapp from name
+# parse a request to get a lapp data and metadata
 
-@bblamp_app.route("/lapp/get/<lapp_name>")
-def get_program(lapp_name):
+# LAPPNAME.info associé a chaque lapp 
+# cf :http://docs.python.org/2/library/configparser.html
+# from_blockly = True/False
+# author = ...
+# comment = ...
+
+# si "from_blocky" => LAPPNAME.by associé a chaque lapp
+
+class LampApp(object):
+    """ Set of function to manage lapp
+    """
+
+    @staticmethod
+    def _lapp_valid_name(lapp_name):
+        """ Check wheter it is a valid lamp app name
+
+        Warning: do not check if the lapp exist or not.
+        """
+        # check name is corect
+        if lapp_name.startswith("_"):
+            raise InvalidLappName(
+                "lapp name shouldn't starts with '_'",
+                lapp_name=lapp_name
+            )
+        elif "." in lapp_name:
+            raise InvalidLappName(
+                "lapp name shouldn't use '.'",
+                lapp_name=lapp_name
+            )
+        return True
+
+    def __init__(self, lapp_name):
+        self._lapp_valid_name(lapp_name)
+        self.name = lapp_name
+        self.py_code = None
+        self.by_code = None
+        self.from_blockly = False
+        self.author = None
+        self.comment = None
+        self.creation_date = None
+        self.modification_date = None
+
+    def python_filname(self):
+        """ Get the python script filename from a given lapp name
+        """
+        return os.path.join(LAPP_DIR, self.name + ".py")
+
+    def exist(self):
+        """ check wheter a lamp app exist or not
+        """
+        return os.path.isfile(self.python_filname())
+
+    def create(self):
+        #TODO
+        pass
+
+    def update(self):
+        pass
+
+    def load(self):
+        # check exist
+        if not self.exist():
+            raise LappDoNotExist(self.name)
+        # load .info
+        # load .py
+        with open(self.python_filname, "r") as lapp_file:
+            self.py_code = lapp_file.read()
+        # load .bly if any
+        
+
+    def encode(self):
+        """ return a python (jsonable) representation of the lapp
+        """
+        lapp = {}
+        lapp["name"] = self.name
+        return lapp
+
+@bblamp_app.route("/lapps/<string:lapp_name>", methods=["GET"])
+def lapps_get(lapp_name):
     """ get the code of a program
     """
-    output = {}
-    # check exist
-    if not _lapp_exist(lapp_name):
-        raise LappDoNotExist(lapp_name)
+    lapp = LampApp(lapp_name)
     # load the file
-    with open(_lappname_to_filname(lapp_name), "r") as lapp_file:
-        output["code"] = lapp_file.read()
-    # extract metadata
-    #TODO
-    return jsonify(output)
+    lapp.load()
+    return jsonify(lapp.encode())
 
-@bblamp_app.route("/lapp/list")
-def list_program():
-    """ list all avaliable lamp apps
+@bblamp_app.route("/lapps/<string:lapp_name>", methods=["DELETE"])
+def lapps_delete(lapp_name):
+    if not lapp_exist(lapp_name):
+        raise LappDoNotExist(lapp_name)
+    filename = lappname_to_filname(lapp_name)
+    os.remove(filename)
+    return '', 204
+
+@bblamp_app.route("/lapps/<string:lapp_name>", methods=["PUT"])
+def lapps_put(lapp_name):
+    """ Create or update a lapp
     """
-    #TODO
-    pass
+    result = {}
+    # check doesn't already exist
+    if lapp_exist(lapp_name):
+        # update
+        raise LappAlreadyExist(lapp_name)
+        result["new"] = False
+    else:
+        # create the new file
+        open(lappname_to_filname(lapp_name), 'a').close()
+        result["new"] = True
+    #result["lapp"] = {}
+    response = jsonify(result)
+    response.status_code = 201
+    return response
+
+@bblamp_app.route("/lapps", methods=["GET"])
+def lapps_list_get():
+    """ Return the list of existing lapp
+    """
+    lapp_list = glob.glob("%s/*.py" % LAPP_DIR)
+    bname = os.path.basename
+    splitext = os.path.splitext
+    lapp_list = [splitext(bname(lapp_filename))[0] \
+                        for lapp_filename in lapp_list]
+    lapp_list = [lapp_name for lapp_name in lapp_list \
+                        if not lapp_name.startswith("_") ]
+    return jsonify(lapps = lapp_list)
+
 
 #-------------------------------------------------------------------------------
 # lapp ctrl API

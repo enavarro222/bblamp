@@ -33,6 +33,12 @@ Lamp app
 * only one running at a time
 * may be run as a service
 * extends a class, that help
+* metadata :
+ - modification date
+ - creation date
+ - author
+ - comment / description
+
 
 Exemple:
 ```python
@@ -76,14 +82,21 @@ Lamp App web editor/manager
 TODO
 ----
 
+* manage list/new/get/update for lamp app (API)
+ - list
+ - update_metadata
+ - get_metadata
+* basic HTML/JS interface (backbone)
+ - model lapp
+ - model lapp_list
+ - model lapp_control
+* clean start/stop/status responses (API)
 * test i2c sensors
 * fix issue with GPIO not as root
 * how to do with interupt ?
 * manage start on boot
-* basic HTML/JS interface
-* manage list/new/get/update for lamp app (API)
-    Note: To edit a code in a browser: http://ace.c9.io/
 * add python editor on interface
+    Note: To edit a code in a browser: http://ace.c9.io/
 * add blocly interface
 * make hardware changeable (pygame, html/js, texte)
 
