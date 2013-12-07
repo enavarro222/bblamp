@@ -4,6 +4,18 @@ bblamp
 Very new projet.
 The idea is to build a lamp that is programmable by a web interface using blockly (https://code.google.com/p/blockly/).
 
+Require
+------
+* flask
+* gevent >= 1.0
+    (https://pypi.python.org/pypi/gevent)
+
+* jquery
+* underscore.js
+* backbone.js
+* ace.js (source code editor)
+* blockly
+
 
 Components
 ----------
@@ -82,6 +94,7 @@ Lamp App web editor/manager
 TODO
 ----
 
+* isolate lapp management API in a blueprint, with separete url with version
 * manage list/new/get/update for lamp app (API)
  - list
  - update_metadata
@@ -91,6 +104,7 @@ TODO
  - model lapp_list
  - model lapp_control
 * clean start/stop/status responses (API)
+* add kill signal catch to lapp, log it correctly before to quit
 * test i2c sensors
 * fix issue with GPIO not as root
 * how to do with interupt ?

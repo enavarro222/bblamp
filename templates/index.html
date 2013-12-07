@@ -1,26 +1,44 @@
 <html>
     <head>
         <title>BBLamp</title>
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bblamp.css') }}">
     </head>
     <body>
         <h1>BBLamp main page</h1>
+        <div id="editor">function foo(items) {
+            var x = "All this is syntax highlighted";
+            return x;
+        }</div>
         <ul>
-            <li><a href="{{ url_for('lapp_run', lapp_name='test') }}">Run test lapp</a></li>
-            <li><a href="{{ url_for('lapp_stop') }}">Stop lapp !</a></li>
-            <li><a href="{{ url_for('lapp_status') }}">Status ?</a></li>
+            <li><a href="{{ url_for('lapps.run', lapp_name='test') }}">Run test lapp</a></li>
+            <li><a href="{{ url_for('lapps.stop') }}">Stop lapp !</a></li>
+            <li><a href="{{ url_for('lapps.status') }}">Status ?</a></li>
+            <li><a href="{{ url_for('lapps.get_list') }}">lapps list (JSON)</a></li>
         </ul>
-        <div id="event"></div>
+        <div id="lapps-list"></div>
+        <p><input id="new-name" type="text"><button id="add">Add</button></p>
 
-        <script type="text/javascript">
+        <div id="lapp"></div>
+        <div id="events"></div>
+    </body>
 
-        var eventOutputContainer = document.getElementById("event");
+    <!-- Lib -->
+    <script src="{{ url_for('static', filename='jquery-1.10.2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='underscore-min.js') }}"></script>
+    <script src="{{ url_for('static', filename='backbone-min.js') }}"></script>
+    <script src="{{ url_for('static', filename='ace/ace.js') }}" type="text/javascript" charset="utf-8"></script>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='lapp.js') }}"></script>
+
+    <script type="text/javascript">
+        var eventOutputContainer = document.getElementById("events");
         var evtSrc = new EventSource("/log/subscribe");
 
         evtSrc.onmessage = function(e) {
-         console.log(e.data);
-         eventOutputContainer.innerHTML = e.data + "<br />" + eventOutputContainer.innerHTML;
+            console.log(e.data);
+            eventOutputContainer.innerHTML = e.data + "<br />" + eventOutputContainer.innerHTML;
         };
+    </script>
 
-        </script>
-    </body>
- </html>
+</html>
