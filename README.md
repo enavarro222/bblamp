@@ -86,32 +86,32 @@ Lamp App web editor/manager
 * view last run(s) log (std+err)
 * set a lapp to be run on startup
 
-
-* no "database": all metadata are in .py files (module docstring + __author__ + __date__ * ...)
-* stdout/stderr/status are stored in files ine : "lapp_out"
+* no "database": all metadata are in a .info file
+* stdout/stderr/status are redirected in files in the dir : "lapp_out"
 
 
 TODO
 ----
 
-* isolate lapp management API in a blueprint, with separete url with version
-* manage list/new/get/update for lamp app (API)
- - list
- - update_metadata
- - get_metadata
-* basic HTML/JS interface (backbone)
- - model lapp
- - model lapp_list
- - model lapp_control
-* clean start/stop/status responses (API)
-* add kill signal catch to lapp, log it correctly before to quit
-* test i2c sensors
-* fix issue with GPIO not as root
-* how to do with interupt ?
-* manage start on boot
-* add python editor on interface
-    Note: To edit a code in a browser: http://ace.c9.io/
-* add blocly interface
+* server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
+* UI: ace editor, add ctrl-s shortcut
+* UI: make a model for the UI it self (selectedLapp)
+* UI: make LappPythonCodeEditor view
+* UI: make a LappSaveView (or not)
+* UI: make a LappView use sub views (and manage leaks)
+* UI: add blocly interface
+* (OK) server: manage save
+* (OK) server: manage .info file
+* (OK) server: isolate lapp management API in a blueprint, with separete url with version
+* (Ok) server: manage list/new/get/update for lamp app (API)
+* (OK) UI: basic HTML/JS interface (backbone)x
+* server: clean start/stop/status responses (API)
+* lapp: add kill signal catch to lapp, log it correctly before to quit
+* lapp: test i2c sensors
+* lapp: fix issue with GPIO not as root
+* (OK) UI: add python editor on interface
 * make hardware changeable (pygame, html/js, texte)
+* lapp: how to do with interupt ?
+* lapp: manage start on boot
 
 

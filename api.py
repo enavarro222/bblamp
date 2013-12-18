@@ -2,9 +2,13 @@
 import os
 import subprocess
 import glob
+import json
 
 from flask import Blueprint
-from flask import jsonify
+from flask import request, abort, jsonify
+
+import ConfigParser
+from ConfigParser import SafeConfigParser
 
 from utils import read_lapp_pidfile
 
@@ -26,14 +30,8 @@ LAPP_PIDFILE = os.path.join(LAPP_OUTDIR, "lapp.pid")
 #-------------------------------------------------------------------------------
 # lapp API
 
-#TODO:
-# create a new lapp
-# update a lapp
-# get a lapp from name
-# parse a request to get a lapp data and metadata
-
 # LAPPNAME.info associé a chaque lapp 
-# cf :http://docs.python.org/2/library/configparser.html
+# cf : http://docs.python.org/2/library/configparser.html
 # from_blockly = True/False
 # author = ...
 # comment = ...
@@ -43,6 +41,14 @@ LAPP_PIDFILE = os.path.join(LAPP_OUTDIR, "lapp.pid")
 class LampApp(object):
     """ Set of function to manage lapp
     """
+    INFO_ATTRS = [
+        # name, get cast fct, set cast fct
+        ("author", None, None),
+        ("comment", None, None),
+        ("from_blockly", lambda x: x.lower() in ("yes", "true", "1"), str),
+    ]
+    INFO_SECTION = "lapp"
+    
     @staticmethod
     def _lapp_valid_name(lapp_name):
         """ Check wheter it is a valid lamp app name
@@ -73,7 +79,7 @@ class LampApp(object):
     def lapps_list():
         """ return the list of existing lapps
         """
-        lapp_list = glob.glob("%s/*.py" % LAPP_DIR)
+        lapp_list = glob.glob("%s/*.info" % LAPP_DIR)
         bname = os.path.basename
         splitext = os.path.splitext
         lapp_list = [splitext(bname(lapp_filename))[0] \
@@ -89,80 +95,153 @@ class LampApp(object):
         # do the py code come from blockly
         self.from_blockly = False
         # author name
-        self.author = None
+        self.author = ""
         # description of the lapp
-        self.comment = None
+        self.comment = ""
         # some date
         self.creation_date = None
         self.modification_date = None
-        ## Code
-        # python code, None if not yet readed
-        self.py_code = None
-        # blockly code, None if not yet readed or doesn't exist
-        self.by_code = None
-        #TODO:
+        self.info_saved = False
         # load .info
+        if self.exist():
+            self.load_info()
+
+    @property
+    def py_code(self):
+        """ reads the python code of the lapp
+        """
+        with open(self.python_filname, "r") as pyfile:
+            py_code = pyfile.read()
+        return py_code
+
+    @py_code.setter
+    def py_code(self, py_code):
+        """ writes a new version of the python code of the lapp
+        """
+        with open(self.python_filname, "w") as pyfile:
+            pyfile.write(py_code)
+
+    @property
+    def by_code(self):
+        """ reads the blokly code of the lapp
+        """
+        if not self.from_blockly:
+            raise ValueError("This lapp is not build using blockly")
+        with open(self.blockly_filname, "r") as byfile:
+            by_code = byfile.read()
+        return by_code
+
+    @by_code.setter
+    def by_code(self, by_code):
+        """ writes a new version of the blockly code of the lapp
+        """
+        if not self.from_blockly:
+            raise ValueError("This lapp is not build using blockly")
+        with open(self.blockly_filname, "w") as byfile:
+            byfile.write(by_code)
+
+    def load_info(self):
+        """ Reads lapp attributes from a config file
+        """
+        parser = SafeConfigParser()
+
+        parser.read(self.info_filname)
+        for attr_name, get_cast, _ in LampApp.INFO_ATTRS:
+            try:
+                value = parser.get(LampApp.INFO_SECTION, attr_name)
+                if get_cast is not None:
+                    value = get_cast(value)
+                print(attr_name, value)
+                setattr(self, attr_name, value)
+            except ConfigParser.NoSectionError, ConfigParser.NoOptionError:
+                pass
+
+    def save_info(self):
+        """ Writes lapp attributes in a config file
+        """
+        parser = SafeConfigParser()
+        parser.add_section(LampApp.INFO_SECTION)
+        for attr_name, _, set_cast in LampApp.INFO_ATTRS:
+            value = getattr(self, attr_name)
+            if set_cast is not None:
+                value = set_cast(value)
+            parser.set(LampApp.INFO_SECTION, attr_name, value)
+        with open(self.info_filname, "w") as infofile:
+            parser.write(infofile)
+
+    @property
+    def info_filname(self):
+        """ Get the filename of the info file 
+        """
+        return os.path.join(LAPP_DIR, self.name + ".info")
 
     @property
     def python_filname(self):
-        """ Get the python script filename from a given lapp name
+        """ Get the python script filename
         """
         return os.path.join(LAPP_DIR, self.name + ".py")
 
     @property
     def blockly_filname(self):
-        """ Get the blockly script filename from a given lapp name
+        """ Get the blockly script filename
         """
         return os.path.join(LAPP_DIR, self.name + ".by")
 
     def exist(self):
         """ check wheter a lamp app exist or not
         """
-        return os.path.isfile(self.python_filname)
+        return os.path.isfile(self.python_filname) \
+                and os.path.isfile(self.info_filname)
 
     def create(self):
         """ Create a new lapp
         """
         if self.exist():
             raise LappAlreadyExist(self.name)
+        # create config file
+        self.save_info()
         # create python file
-        with open(self.python_filname, "w") as pyfile:
-            pyfile.write("#-*- coding:utf-8 -*-\n")
+        self.py_code = "#-*- coding:utf-8 -*-\n"
 
     def delete(self):
         """ Remove the lapp
         """
         if not self.exist():
             raise LappDoNotExist()
+        # remove info file
+        os.remove(self.info_filname)
         # destroy python file
         os.remove(self.python_filname)
-        #TODO: todo remove blockly file (if needed)
-        #TODO: remove info file
+        #todo remove blockly file (if needed)
+        if self.from_blockly:
+            os.remove(self.blockly_filname)
 
-    def update(self):
-        pass
-
-    def load_code(self):
-        # check exist
-        if not self.exist():
-            raise LappDoNotExist(self.name)
-        # load .py
-        with open(self.python_filname, "r") as lapp_file:
-            self.py_code = lapp_file.read()
-        #TODO load .bly if any
+    def update(self, new_vals):
+        print(new_vals)
+        for attr, get_cast, _ in LampApp.INFO_ATTRS:
+            if attr in new_vals:
+                value = new_vals[attr]
+                setattr(self, attr, value)
+        self.save_info()
+        if "py_code" in new_vals:
+            self.py_code = new_vals["py_code"]
+        if "by_code" in new_vals:
+            self.by_code = new_vals["by_code"]
 
     def encode(self):
         """ return a python (jsonable) representation of the lapp
         """
+        # check exist
+        if not self.exist():
+            raise LappDoNotExist(self.name)
         lapp = {}
         lapp["id"] = self.name
         lapp["name"] = self.name
         lapp["from_blockly"] = self.from_blockly
         lapp["comment"] = self.comment
         lapp["author"] = self.author
-        if self.py_code is not None:
-            lapp["py_code"] = self.py_code
-        if self.by_code is not None:
+        lapp["py_code"] = self.py_code
+        if self.from_blockly:
             lapp["by_code"] = self.by_code
         return lapp
 
@@ -239,8 +318,6 @@ class LampApp(object):
 def get_list():
     """ Return the list of existing lapp
     """
-    import gevent
-    gevent.sleep(1); #XXX
     all_lapps = LampApp.lapps_list()
     all_lapps = [lapp.encode() for lapp in all_lapps]
     return jsonify(lapps=all_lapps)
@@ -249,11 +326,8 @@ def get_list():
 def get(lapp_name):
     """ get the code of a program
     """
-    import gevent
-    gevent.sleep(1.5); #XXX
     lapp = LampApp(lapp_name)
     # load the file
-    lapp.load_code()
     return jsonify(lapp.encode())
 
 @lapps.route("/lapps/<string:lapp_name>", methods=["DELETE"])
@@ -271,7 +345,10 @@ def put(lapp_name):
     result = {}
     lapp = LampApp(lapp_name)
     if lapp.exist():
-        lapp.update()
+        if not request.headers['Content-Type'] == 'application/json':
+            abort(415)
+        data = request.json
+        lapp.update(data)
         result["new"] = False
     else:
         # create the new lapp
