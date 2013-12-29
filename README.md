@@ -2,7 +2,7 @@ bblamp
 ======
 
 Very new projet.
-The idea is to build a lamp that is programmable by a web interface using blockly (https://code.google.com/p/blockly/).
+The idea is to build a lamp that is programmable throw a web interface using blockly (https://code.google.com/p/blockly/).
 
 Require
 ------
@@ -78,7 +78,7 @@ Lamp App web editor/manager
 * create a new lapp
 * edit a lapp directly in python
 * edit a lapp with blockly
-* delete a lapp
+* delete a lapp (with confirmation)
 * run a lapp
 * stop the running lapp
 * view which lapp is running (if any)
@@ -94,24 +94,36 @@ TODO
 ----
 
 * server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
-* UI: ace editor, add ctrl-s shortcut
-* UI: make a model for the UI it self (selectedLapp)
-* UI: make LappPythonCodeEditor view
-* UI: make a LappSaveView (or not)
-* UI: make a LappView use sub views (and manage leaks)
+* UI: manage log and output
 * UI: add blocly interface
+* UI: add ctrl-s shortcut (save)
+* UI: check ajax call error
+* UI: add remove an app (with confirmation)
+* UI: better css
+* UI: manage lapp metadata
+* UI: front page...
+* UI: reorganise views in different js files
+* server: clean start/stop/status responses (API)
+* lapp: add kill signal catch to lapp, log it correctly before to quit
+* lapp: test i2c sensors
+* lapp: fix issue with GPIO not as root
+* lapp: how to do with interupt ?
+* lapp: manage start on boot
+* make hardware changeable (pygame, html/js, texte)
+
+* (cancel) UI: make a model for the UI it self (selectedLapp)
+* (cancel) UI: use good html5 balise : section, header, nav, ... http://stackoverflow.com/questions/4781077/html5-best-practices-section-header-aside-article-tags
+
+* (ok) UI: make LappPythonCodeEditor view
+* (ok) UI: make a LappSaveView
+* (ok) UI: close a lapp
+* (OK) UI: make a LappView use sub views (and manage leaks)
+* (OK) UI: test backbone layout manager plugin
 * (OK) server: manage save
 * (OK) server: manage .info file
 * (OK) server: isolate lapp management API in a blueprint, with separete url with version
 * (Ok) server: manage list/new/get/update for lamp app (API)
 * (OK) UI: basic HTML/JS interface (backbone)x
-* server: clean start/stop/status responses (API)
-* lapp: add kill signal catch to lapp, log it correctly before to quit
-* lapp: test i2c sensors
-* lapp: fix issue with GPIO not as root
 * (OK) UI: add python editor on interface
-* make hardware changeable (pygame, html/js, texte)
-* lapp: how to do with interupt ?
-* lapp: manage start on boot
 
 

@@ -1,3 +1,8 @@
+/* -------------------------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+}
 
 body {
   margin: 0;
@@ -6,11 +11,91 @@ body {
   color: #444;
 }
 
-ul.lapps-list .selected{
+#head {
+    background: #eee;
+    margin: 0;
+    height: 40px;
+    padding: 4px;
+}
+
+#side {
+    width: 200px;
+    float: left;
+}
+
+#main{
+    margin: 0;
+    margin-left: 230px;
+}
+
+.float_clear {
+    clear: both;
+}
+
+/* -------------------------------------------------------------------------- */
+#head .left {
+    height: 40px;
+    float: left;
+}
+
+#head .right {
+    height: 40px;
+    float: right;
+}
+
+#head a.close {
+    color: black;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+#head a.close:hover {
+    font-style: italic;
+}
+
+#head button {
+    height: 35;
+    margin: 5;
+    margin-right: 15;
+    margin-left: 2;
+    padding: 4;
+}
+
+/* -------------------------------------------------------------------------- */
+#title-view {
+}
+
+
+/* -------------------------------------------------------------------------- */
+#side {
+    padding: 5px;
+}
+
+ul.lapp_list .selected{
     font-weight: bold;
 }
 
-.editor { 
-    height: 400px;
-    width: 500px;
+ul.lapp_list li{
+    margin: 2px;
+    margin-left: 5px;
+}
+
+/* -------------------------------------------------------------------------- */
+#ace_editor_mask {
+    height: 500px;
+    overflow-y: hidden;
+}
+
+#ace_editor_container {
+    position: relative;
+    height: 10000px;
+}
+
+#the_ace_editor { 
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 15px;
 }

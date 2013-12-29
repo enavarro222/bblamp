@@ -4,37 +4,88 @@
         <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bblamp.css') }}">
     </head>
     <body>
-        <h1>BBLamp main page</h1>
-        <ul>
-            <li><a href="{{ url_for('lapps.run', lapp_name='test') }}">Run test lapp</a></li>
-            <li><a href="{{ url_for('lapps.stop') }}">Stop lapp !</a></li>
-            <li><a href="{{ url_for('lapps.status') }}">Status ?</a></li>
-            <li><a href="{{ url_for('lapps.get_list') }}">lapps list (JSON)</a></li>
-        </ul>
-        <div id="lapps-list"></div>
-        <p><input id="new-name" type="text"><button id="add">Add</button></p>
+        <!-- "app" is the main dom element for the app -->
+        <div id="app">
+            <div class="init_load">Application loading...</div>
+        </div>
+        
+        <!-- Templates -->
+        <script id="main-layout" type="layout">
+            <div id="head">
+                <div class="left" id="title-view"></div>
+                <div class="right" id="lapp-status-view"></div>
+                <div class="right" id="lapp-run-view"></div>
+                <div class="float_clear" />
+            </div>
+            
+            <div id="side">
+                <div id="lapp-list-view"></div>
+                <p><input id="new-name" type="text"><button id="add">Add</button></p>
+            </div>
+            
+            <div id="main">
+                <div id="lapp-editor-view">
+                </div>
+            </div>
 
-        <div id="lapp"></div>
-        <div id="events"></div>
+        </script>
+        
+        <script id="lapp-title" type="layout">
+            <h1><%= name %>
+            <% if (selected) { %>
+            <a href="#" class="close">[x]</a></h1>
+            <% } %>
+        </script>
+
+        <script id="lapp-ace-editor" type="layout">
+            <div id="ace_editor_mask">
+                <div id="ace_editor_container">
+                    <pre id="the_ace_editor"></pre>
+                </div>
+            </div>
+        </script>
+
+        <script id="lapp-run" type="layout">
+            <% if (state == "modified") { %>
+            <button type="button" name="save">Save</button>
+            <% } %>
+            <button type="button" name="run">Run</button>
+        </script>
+
+        <script id="lapp-list" type="layout">
+            <ul class="lapp_list">
+            </ul>
+        </script>
+        
+        <script id="lapp-list-item" type="layout">
+            <li>
+                <a href="<%= name %>" class="<% if (selected) { %>selected<% } %>" > 
+                <%= name %>
+                <% if (state=="modified") { %>(M)<% } %>
+                </a>
+            </li>
+        </script>
+
+        <script id="lapp-status" type="layout">
+            <div class="lapp_status">
+                <!--<%= status %>-->
+                <% if (status=="running") { %>
+                    <button type="button" name="stop">stop '<%= script_name %>'</button>
+                <% } %>
+            </div>
+        </script>
+
+        <!-- Lib -->
+        <script src="{{ url_for('static', filename='jquery-1.10.2.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='underscore-min.js') }}"></script>
+        <script src="{{ url_for('static', filename='backbone-min.js') }}"></script>
+        <script src="{{ url_for('static', filename='backbone.layoutmanager.js') }}"></script>
+        <script src="{{ url_for('static', filename='ace/ace.js') }}" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Scripts -->
+        <script src="{{ url_for('static', filename='lapp_models.js') }}"></script>
+        <script src="{{ url_for('static', filename='lapp.js') }}"></script>
+
     </body>
-
-    <!-- Lib -->
-    <script src="{{ url_for('static', filename='jquery-1.10.2.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='underscore-min.js') }}"></script>
-    <script src="{{ url_for('static', filename='backbone-min.js') }}"></script>
-    <script src="{{ url_for('static', filename='ace/ace.js') }}" type="text/javascript" charset="utf-8"></script>
-
-    <!-- Scripts -->
-    <script src="{{ url_for('static', filename='lapp.js') }}"></script>
-
-    <script type="text/javascript">
-        var eventOutputContainer = document.getElementById("events");
-        var evtSrc = new EventSource("/log/subscribe");
-
-        evtSrc.onmessage = function(e) {
-            console.log(e.data);
-            eventOutputContainer.innerHTML = e.data + "<br />" + eventOutputContainer.innerHTML;
-        };
-    </script>
-
 </html>
+

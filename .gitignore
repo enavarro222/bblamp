@@ -1,3 +1,12 @@
+# custom
+static/backbone.layoutmanager.js
+ace-builds/
+static/ace
+blockly/
+static/blockly
+lapp_output/
+
+# std
 *.py[cod]
 *~
 
