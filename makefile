@@ -1,6 +1,8 @@
 
-.phony: install-ace
+.phony: get-ace install-ace
 
+install: get-ace install-ace
+	echo "done";
 
 get-ace:
 	git clone https://github.com/ajaxorg/ace-builds.git
@@ -14,6 +16,3 @@ get-blockly:
 install-blockly:
 	cd static && ln -s ../blockly ./
 
-
-install-bb-layout:
-	cd static && wget https://github.com/tbranyen/backbone.layoutmanager/raw/master/backbone.layoutmanager.js

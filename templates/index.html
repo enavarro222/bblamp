@@ -20,7 +20,7 @@
             
             <div id="side">
                 <div id="lapp-list-view"></div>
-                <p><input id="new-name" type="text"><button id="add">Add</button></p>
+                <div id="new-lapp-view"></div>
             </div>
             
             <div id="main">
@@ -57,6 +57,10 @@
             </ul>
         </script>
         
+        <script id="lapp-new" type="layout">
+            <p><input name="lapp_name" type="text"><button type="button" name="add">Add</button></p>
+        </script>
+        
         <script id="lapp-list-item" type="layout">
             <li>
                 <a href="<%= name %>" class="<% if (selected) { %>selected<% } %>" > 
@@ -76,14 +80,16 @@
         </script>
 
         <!-- Lib -->
-        <script src="{{ url_for('static', filename='jquery-1.10.2.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='underscore-min.js') }}"></script>
-        <script src="{{ url_for('static', filename='backbone-min.js') }}"></script>
-        <script src="{{ url_for('static', filename='backbone.layoutmanager.js') }}"></script>
+        <script src="{{ url_for('static', filename='jslib/jquery-1.10.2.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jslib/underscore-min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jslib/backbone-min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jslib/backbone.layoutmanager.js') }}"></script>
         <script src="{{ url_for('static', filename='ace/ace.js') }}" type="text/javascript" charset="utf-8"></script>
 
         <!-- Scripts -->
+        <script src="{{ url_for('static', filename='utils.js') }}"></script>
         <script src="{{ url_for('static', filename='lapp_models.js') }}"></script>
+        <script src="{{ url_for('static', filename='lapp_views.js') }}"></script>
         <script src="{{ url_for('static', filename='lapp.js') }}"></script>
 
     </body>

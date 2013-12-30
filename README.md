@@ -100,21 +100,24 @@ Lamp App web editor/manager
 TODO
 ----
 
-- [ ] UI: add lapp button in a proper View
 - [ ] UI: manage log and output, list, clean, popup?
 - [ ] UI: blockly: first integration (no translation, no save/load)
 - [ ] UI: blockly: save/load
 - [ ] UI: blockly: python translation (python read-only)
 - [ ] UI: blockly: Lapp basic custom block
 - [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice
-- [ ] UI: check ajax call error
+- [ ] UI: run/stop/etc... check ajax call error
 - [ ] UI: add remove an app (with confirmation)
-- [ ] UI: better css (twitter bootstrap ?
+- [ ] UI: better css (twitter bootstrap ?)
 - [ ] UI: manage lapp metadata
-- [ ] UI: front page...
-- [ ] UI: reorganise views in different js files
+- [ ] UI: autocompletion in ace editor
+- [ ] UI: better front page...
+- [ ] server: integration with nginx or apache
 - [ ] server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
 - [ ] server: clean start/stop/status responses (API)
+- [ ] server: manage (simply) concurrent edition
+- [ ] server: store lapp in a local git repo (so store history)
+- [ ] lapp: reset led on exit
 - [ ] lapp: add kill signal catch to lapp, log it correctly before to quit
 - [ ] lapp: test i2c sensors
 - [ ] lapp: fix issue with GPIO not as root
@@ -126,6 +129,10 @@ TODO
 - [ ] (cancel) UI: make a model for the UI it self (selectedLapp)
 - [ ] (cancel) UI: use good html5 balise : section, header, nav, ... http://stackoverflow.com/questions/4781077/html5-best-practices-section-header-aside-article-tags
 
+- [x] UI: reorganise views in a different js file
+- [x] UI: integrate backbone-layout in the git repo
+- [x] UI: JS lib in a subdir
+- [x] UI: add lapp button in a proper View
 - [x] UI: make LappPythonCodeEditor view
 - [x] UI: make a LappSaveView
 - [x] UI: close a lapp
