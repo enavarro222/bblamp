@@ -1,15 +1,22 @@
 bblamp
 ======
 
-Very new projet.
-The idea is to build a lamp that is programmable throw a web interface using blockly (https://code.google.com/p/blockly/).
+The idea is to build a lamp that is easily programmable throw a web interface using [blockly](https://code.google.com/p/blockly/) in order to teach programming to childs and people who are a priori not interested in that.
+
+You need a rPy in a nice box connected to a strip of RGB leds, a bunch of sensors and buttons.
+Connect it to your local network, and install BBLamp on the rPy.
+Then you can navigate to the rPy ip address and start programing it !
+
+Blockly makes programming easy and intuitive, and the lamp (with led and sensors) make it attractive !
+
+**Warning : This project  is not yet usable !**
+This project is very young but in (active) development. Feel free to contact me for any question, comments, typo correction or whatever...
+
 
 Require
 ------
 * flask
-* gevent >= 1.0
-    (https://pypi.python.org/pypi/gevent)
-
+* gevent >= 1.0 (https://pypi.python.org/pypi/gevent)
 * jquery
 * underscore.js
 * backbone.js
@@ -20,10 +27,10 @@ Require
 Components
 ----------
 
-* Rasbperry Pi
-* string of 25 12mm LedPixels (SPI port)
+* Raspberry Pi
+* string of 25 12mm LedPixels WS2801 (SPI port)
 * light sensor (I2C)
-* DHT22 
+* DHT22
 * push button
 * PIR sensor
 * small mic
@@ -93,37 +100,42 @@ Lamp App web editor/manager
 TODO
 ----
 
-* server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
-* UI: manage log and output
-* UI: add blocly interface
-* UI: add ctrl-s shortcut (save)
-* UI: check ajax call error
-* UI: add remove an app (with confirmation)
-* UI: better css
-* UI: manage lapp metadata
-* UI: front page...
-* UI: reorganise views in different js files
-* server: clean start/stop/status responses (API)
-* lapp: add kill signal catch to lapp, log it correctly before to quit
-* lapp: test i2c sensors
-* lapp: fix issue with GPIO not as root
-* lapp: how to do with interupt ?
-* lapp: manage start on boot
-* make hardware changeable (pygame, html/js, texte)
+- [ ] UI: add lapp button in a proper View
+- [ ] UI: manage log and output, list, clean, popup?
+- [ ] UI: blockly: first integration (no translation, no save/load)
+- [ ] UI: blockly: save/load
+- [ ] UI: blockly: python translation (python read-only)
+- [ ] UI: blockly: Lapp basic custom block
+- [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice
+- [ ] UI: check ajax call error
+- [ ] UI: add remove an app (with confirmation)
+- [ ] UI: better css (twitter bootstrap ?
+- [ ] UI: manage lapp metadata
+- [ ] UI: front page...
+- [ ] UI: reorganise views in different js files
+- [ ] server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
+- [ ] server: clean start/stop/status responses (API)
+- [ ] lapp: add kill signal catch to lapp, log it correctly before to quit
+- [ ] lapp: test i2c sensors
+- [ ] lapp: fix issue with GPIO not as root
+- [ ] lapp: how to do with interupt ?
+- [ ] lapp: manage start on boot
+- [ ] lapp: ledPixel better color management
+- [ ] make hardware changeable (pygame, html/js, texte)
 
-* (cancel) UI: make a model for the UI it self (selectedLapp)
-* (cancel) UI: use good html5 balise : section, header, nav, ... http://stackoverflow.com/questions/4781077/html5-best-practices-section-header-aside-article-tags
+- [ ] (cancel) UI: make a model for the UI it self (selectedLapp)
+- [ ] (cancel) UI: use good html5 balise : section, header, nav, ... http://stackoverflow.com/questions/4781077/html5-best-practices-section-header-aside-article-tags
 
-* (ok) UI: make LappPythonCodeEditor view
-* (ok) UI: make a LappSaveView
-* (ok) UI: close a lapp
-* (OK) UI: make a LappView use sub views (and manage leaks)
-* (OK) UI: test backbone layout manager plugin
-* (OK) server: manage save
-* (OK) server: manage .info file
-* (OK) server: isolate lapp management API in a blueprint, with separete url with version
-* (Ok) server: manage list/new/get/update for lamp app (API)
-* (OK) UI: basic HTML/JS interface (backbone)x
-* (OK) UI: add python editor on interface
+- [x] UI: make LappPythonCodeEditor view
+- [x] UI: make a LappSaveView
+- [x] UI: close a lapp
+- [x] UI: make a LappView use sub views (and manage leaks)
+- [x] UI: test backbone layout manager plugin
+- [x] server: manage save
+- [x] server: manage .info file
+- [x] server: isolate lapp management API in a blueprint, with separete url with version
+- [x] server: manage list/new/get/update for lamp app (API)
+- [x] UI: basic HTML/JS interface (backbone)x
+- [x] UI: add python editor on interface
 
 
