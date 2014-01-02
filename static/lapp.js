@@ -6,7 +6,7 @@ var BBL = {};
 var LampAppRouter = Backbone.Router.extend({
     routes: {
         '': 'index',
-        ':lapp_name': 'open_lapp'
+        ':lapp_name': 'open_lapp',
     },
 
     log: function(msg) {
@@ -49,7 +49,7 @@ LampAppMainView = Backbone.Layout.extend({
     },
 
     log: function(msg) {
-        console.log('<MAIN_VIEW> '+ msg);
+        console.log('[main_view] ' + msg);
     },
 
     /* callback when a lapp is selected
@@ -61,13 +61,20 @@ LampAppMainView = Backbone.Layout.extend({
             this.setView("#lapp-editor-view", new Views.LappAceEditorView({
                 model: this.collection.selected,
             })).render();
+//            this.setView("#lapp-editor-view", new Views.LappBlocklyEditorView({
+//                model: this.collection.selected,
+//            })).render();
             this.setView("#lapp-run-view", new Views.LappRunView({
+                model: this.collection.selected,
+            })).render();
+            this.setView("#lapp-menu-view", new Views.LappMenuView({
                 model: this.collection.selected,
             })).render();
         } else { // lapp is un-selected
             this.log("lapp un-selected");
             this.removeView("#lapp-editor-view");
             this.removeView("#lapp-run-view");
+            this.removeView("#lapp-menu-view");
         }
     }
 });
@@ -100,12 +107,7 @@ BBL.init = function() {
         collection: BBL.lapp_collection,
     }));
 
-    // setup title view
-    BBL.main_view.setView("#title-view", new Views.TitleView({
-        collection: BBL.lapp_collection,
-    }));
-
-    // settupt status view
+    // setup status view
     BBL.main_view.setView("#lapp-status-view", new Views.LappStatusView({
         model: BBL.status_model,
     }));

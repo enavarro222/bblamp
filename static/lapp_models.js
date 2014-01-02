@@ -21,7 +21,7 @@ var LappModel = Backbone.Model.extend({
         this.changeState('partial', {silent: true});
         this.on('change', this.onChange);
         // attributes that are monitor to change lapp state
-        this.saved_attrs = ['py_code'];
+        this.saved_attrs = ['py_code', 'by_code', 'from_blockly'];
     },
 
     select: function() {
@@ -48,6 +48,10 @@ var LappModel = Backbone.Model.extend({
         }
     },
 
+    isModified: function(){
+        return this.get("state") == "modified";
+    },
+
     //override save fct to manage state
     save: function(attrs, options) {
         var result = Backbone.Model.prototype.save.call(this, attrs, options);
@@ -56,6 +60,14 @@ var LappModel = Backbone.Model.extend({
             self.changeState('uptodate');
         });
         return result;
+    },
+    
+    // run the lapp (on the server)
+    run: function() {
+        // TODO: stop first, check callbacks
+        var lappName = this.id;
+        this.log("*run* : /v1/ctrl/run/" + lappName);
+        $.ajax("/v1/ctrl/run/" + lappName);
     },
 
     //override fetch fct to manage state
@@ -70,9 +82,12 @@ var LappModel = Backbone.Model.extend({
     },
 
     /* called when the model is changed, update the state
+    *  update the model state if one of the saved attribut has changed
     */
     onChange: function() {
-        if (this.get('state') != 'partial' && this.hasChanged(this.saved_attrs)) {
+        this.log("changed");
+        if (this.get('state') != 'partial' &&
+                _.intersection(_.keys(this.changedAttributes()), this.saved_attrs).length > 0) {
             this.changeState('modified');
         }
     }

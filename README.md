@@ -29,6 +29,9 @@ Components
 
 * Raspberry Pi
 * string of 25 12mm LedPixels WS2801 (SPI port)
+    Warning. you need led drive by WS2801 and **not** WS2811.
+    WS2801 strips have 4 wires and can easily be driven by a rPy,
+    whereas WS2811 strips have 3 wires and can **not** be driven by a rPy.
 * light sensor (I2C)
 * DHT22
 * push button
@@ -100,35 +103,45 @@ Lamp App web editor/manager
 TODO
 ----
 
-- [ ] UI: manage log and output, list, clean, popup?
-- [ ] UI: blockly: first integration (no translation, no save/load)
-- [ ] UI: blockly: save/load
+- [ ] UI: manage log and output, list, clean, pop-up ?
+- [ ] UI: switch between two editors
+- [ ] UI: blockly: auto-resize
 - [ ] UI: blockly: python translation (python read-only)
 - [ ] UI: blockly: Lapp basic custom block
 - [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice
 - [ ] UI: run/stop/etc... check ajax call error
+- [ ] UI: run when already running ...
 - [ ] UI: add remove an app (with confirmation)
-- [ ] UI: better css (twitter bootstrap ?)
 - [ ] UI: manage lapp metadata
-- [ ] UI: autocompletion in ace editor
+- [ ] UI: ace editor: autocompletion
+- [ ] UI: (BUG) event may deconect
 - [ ] UI: better front page...
-- [ ] server: integration with nginx or apache
+- [ ] UI: lapp started time "since" : https://github.com/philbooth/vagueTime.js
+- [ ] UI: use require.js
+- [ ] server: get SyntaxError
+- [ ] server: integration with nginx (http://salem.harrache.info/application-wsgi-avec-gevent-et-nginx.html)
 - [ ] server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
 - [ ] server: clean start/stop/status responses (API)
 - [ ] server: manage (simply) concurrent edition
 - [ ] server: store lapp in a local git repo (so store history)
+- [ ] lapp: move to event based ! (every k sec, on button pressed, etc...)
 - [ ] lapp: reset led on exit
 - [ ] lapp: add kill signal catch to lapp, log it correctly before to quit
-- [ ] lapp: test i2c sensors
+- [ ] lapp: add i2c sensors
+- [ ] lapp: add DHT22 sensors
+- [ ] lapp: add GPIO button
+- [ ] lapp/server: manage hardware (what present, what needed)
 - [ ] lapp: fix issue with GPIO not as root
 - [ ] lapp: how to do with interupt ?
 - [ ] lapp: manage start on boot
 - [ ] lapp: ledPixel better color management
-- [ ] make hardware changeable (pygame, html/js, texte)
+- [ ] lapp: make a kivy to develop and test apps when no hardware
 
-- [ ] (cancel) UI: make a model for the UI it self (selectedLapp)
-- [ ] (cancel) UI: use good html5 balise : section, header, nav, ... http://stackoverflow.com/questions/4781077/html5-best-practices-section-header-aside-article-tags
 
+- [x] UI: blockly: first integration (no translation, no save/load)
+- [x] UI: blockly: save/load
+- [x] UI: use twitter bootstrap
+- [x] UI: (BUG) ace editor: height error when open a lapp
 - [x] UI: reorganise views in a different js file
 - [x] UI: integrate backbone-layout in the git repo
 - [x] UI: JS lib in a subdir

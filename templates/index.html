@@ -1,42 +1,107 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <title>BBLamp</title>
-        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bblamp.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+<!--        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bblamp.css') }}">-->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bs_bblamp.css') }}">
     </head>
     <body>
         <!-- "app" is the main dom element for the app -->
         <div id="app">
             <div class="init_load">Application loading...</div>
         </div>
+
         
         <!-- Templates -->
         <script id="main-layout" type="layout">
-            <div id="head">
-                <div class="left" id="title-view"></div>
-                <div class="right" id="lapp-status-view"></div>
-                <div class="right" id="lapp-run-view"></div>
-                <div class="float_clear" />
-            </div>
-            
-            <div id="side">
-                <div id="lapp-list-view"></div>
-                <div id="new-lapp-view"></div>
-            </div>
-            
-            <div id="main">
-                <div id="lapp-editor-view">
+            <div id="head" class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button class="navbar-toggle collapsed" data-target=".navbar-collapse" data-toggle="collapse" type="button">
+                            <span class="sr-only"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">BBLamp</a>
+                    </div>
+                    <div class="navbar-collapse">
+                        <div id="lapp-menu-view"></div>
+                        <div id="lapp-status-view"></div>
+                        <div id="lapp-run-view"></div>
+                    </div>
                 </div>
             </div>
-
+            
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3" id="side">
+                        <div id="lapp-list-view"></div>
+                        <div id="new-lapp-view"></div>
+                    </div>
+                    
+                    <div class="col-md-9" id="main">
+                        <div id="lapp-editor-view">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </script>
         
-        <script id="lapp-title" type="layout">
-            <h1><%= name %>
-            <% if (selected) { %>
-            <a href="#" class="close">[x]</a></h1>
-            <% } %>
+        <script id="lapp-menu" type="layout">
+            <ul class="nav navbar-nav">
+                <li class="active dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= name %> <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li <% if (state != 'modified') { %>class="disabled"<% } %> ><a href="#" class="bb_save">Save</a></li>
+                    <li><a href="#" class="bb_run">Run</a></li>
+                    <li><a href="#" class="bb_close">Close</a></li>
+                    <!--<li class="divider"></li>-->
+                    <!--<li class="dropdown-header">Nav header</li>-->
+                    <!--<li><a href="#">Separated link</a></li>-->
+                    <!--<li><a href="#">One more separated link</a></li>-->
+                  </ul>
+                </li>
+            </ul>
         </script>
 
+        <script id="lapp-run" type="layout">
+            <form class="nav navbar-right navbar-form form-inline">
+                <button class="bb_save_run btn btn-default btn btn-success" type="button">
+                    <% if (modified) { %>Save &amp; Run<% } else { %> Run <% } %>
+                    '<%= name %>'
+                </button>
+            </form>
+        </script>
+        
+        <script id="lapp-status" type="layout">
+            <form class="nav navbar-right navbar-form form-inline">
+                <div class="btn-group">
+                    <% if (status=="running") { %>
+                      <button type="button" class="bb_stop btn btn-danger">Stop '<%= script_name %>'</button>
+                      <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                            <li class="dropdown-header">
+                                '<%= script_name %>' running
+                            </li>
+                            <li>
+                                <a href="#" class="bb_stop">Stop '<%= script_name %>'</a>
+                            </li>
+                      </ul>
+                    </div>
+                <% } else { %>
+                      <button type="button" class="disabled btn btn-danger">nothing running</button>
+                <% } %>
+                </div>
+            </form>
+        </script>
+        
         <script id="lapp-ace-editor" type="layout">
             <div id="ace_editor_mask">
                 <div id="ace_editor_container">
@@ -45,12 +110,23 @@
             </div>
         </script>
 
-        <script id="lapp-run" type="layout">
-            <% if (state == "modified") { %>
-            <button type="button" name="save">Save</button>
-            <% } %>
-            <button type="button" name="run">Run</button>
+        <script id="lapp-blockly-editor" type="layout">
+            <div id="blockly_editor_mask">
+                <div id="blockly_editor_container">
+                    <pre id="the_blockly_editor" style="height: 480px; width: 600px;"></pre>
+                </div>
+            </div>
+            <xml id="blockly_toolbox" style="display: none">
+                <block type="controls_if"></block>
+                <block type="controls_repeat_ext"></block>
+                <block type="logic_compare"></block>
+                <block type="math_number"></block>
+                <block type="math_arithmetic"></block>
+                <block type="text"></block>
+                <block type="text_print"></block>
+            </xml>
         </script>
+
 
         <script id="lapp-list" type="layout">
             <ul class="lapp_list">
@@ -58,39 +134,38 @@
         </script>
         
         <script id="lapp-new" type="layout">
-            <p><input name="lapp_name" type="text"><button type="button" name="add">Add</button></p>
+            <p><input name="lapp_name" type="text"><button type="button" class="btn btn-default" name="add">Add</button></p>
         </script>
         
         <script id="lapp-list-item" type="layout">
             <li>
-                <a href="<%= name %>" class="<% if (selected) { %>selected<% } %>" > 
-                <%= name %>
-                <% if (state=="modified") { %>(M)<% } %>
-                </a>
+                <% if (from_blockly) { %>[B]<% } %>
+                <a href="<%= name %>" class="<% if (selected) { %>selected<% } %>" ><%= name %></a>
+                <% if (state=="modified") { %> *<% } %>
             </li>
         </script>
 
-        <script id="lapp-status" type="layout">
-            <div class="lapp_status">
-                <!--<%= status %>-->
-                <% if (status=="running") { %>
-                    <button type="button" name="stop">stop '<%= script_name %>'</button>
-                <% } %>
-            </div>
-        </script>
-
         <!-- Lib -->
-        <script src="{{ url_for('static', filename='jslib/jquery-1.10.2.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='jslib/underscore-min.js') }}"></script>
-        <script src="{{ url_for('static', filename='jslib/backbone-min.js') }}"></script>
-        <script src="{{ url_for('static', filename='jslib/backbone.layoutmanager.js') }}"></script>
-        <script src="{{ url_for('static', filename='ace/ace.js') }}" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/jquery-1.10.2.min.js') }}"></script>
+
+        <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/underscore-min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/backbone-min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/backbone.layoutmanager.js') }}"></script>
+
+        <script type="text/javascript" src="{{ url_for('static', filename='ace/ace.js') }}" charset="utf-8"></script>
+
+        <script type="text/javascript" src="{{ url_for('static', filename='blockly/blockly_compressed.js') }}""></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='blockly/blocks_compressed.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='blockly/msg/js/en.js') }}"></script>
+
 
         <!-- Scripts -->
-        <script src="{{ url_for('static', filename='utils.js') }}"></script>
-        <script src="{{ url_for('static', filename='lapp_models.js') }}"></script>
-        <script src="{{ url_for('static', filename='lapp_views.js') }}"></script>
-        <script src="{{ url_for('static', filename='lapp.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='utils.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='lapp_models.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='lapp_views.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='lapp.js') }}"></script>
 
     </body>
 </html>

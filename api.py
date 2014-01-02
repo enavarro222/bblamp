@@ -151,7 +151,6 @@ class LampApp(object):
                 value = parser.get(LampApp.INFO_SECTION, attr_name)
                 if get_cast is not None:
                     value = get_cast(value)
-                print(attr_name, value)
                 setattr(self, attr_name, value)
             except ConfigParser.NoSectionError, ConfigParser.NoOptionError:
                 pass
@@ -217,7 +216,6 @@ class LampApp(object):
             os.remove(self.blockly_filname)
 
     def update(self, new_vals):
-        print(new_vals)
         for attr, get_cast, _ in LampApp.INFO_ATTRS:
             if attr in new_vals:
                 value = new_vals[attr]
