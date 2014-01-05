@@ -110,7 +110,7 @@ class LampApp(object):
     def py_code(self):
         """ reads the python code of the lapp
         """
-        with open(self.python_filname, "r") as pyfile:
+        with open(self.python_filename, "r") as pyfile:
             py_code = pyfile.read()
         return py_code
 
@@ -118,7 +118,7 @@ class LampApp(object):
     def py_code(self, py_code):
         """ writes a new version of the python code of the lapp
         """
-        with open(self.python_filname, "w") as pyfile:
+        with open(self.python_filename, "w") as pyfile:
             pyfile.write(py_code)
 
     @property
@@ -127,7 +127,10 @@ class LampApp(object):
         """
         if not self.from_blockly:
             raise ValueError("This lapp is not build using blockly")
-        with open(self.blockly_filname, "r") as byfile:
+        if not os.path.isfile(self.blockly_filename):
+            #XXX: add log warning
+            self.by_code = ""
+        with open(self.blockly_filename, "r") as byfile:
             by_code = byfile.read()
         return by_code
 
@@ -137,7 +140,7 @@ class LampApp(object):
         """
         if not self.from_blockly:
             raise ValueError("This lapp is not build using blockly")
-        with open(self.blockly_filname, "w") as byfile:
+        with open(self.blockly_filename, "w") as byfile:
             byfile.write(by_code)
 
     def load_info(self):
@@ -145,7 +148,7 @@ class LampApp(object):
         """
         parser = SafeConfigParser()
 
-        parser.read(self.info_filname)
+        parser.read(self.info_filename)
         for attr_name, get_cast, _ in LampApp.INFO_ATTRS:
             try:
                 value = parser.get(LampApp.INFO_SECTION, attr_name)
@@ -165,23 +168,23 @@ class LampApp(object):
             if set_cast is not None:
                 value = set_cast(value)
             parser.set(LampApp.INFO_SECTION, attr_name, value)
-        with open(self.info_filname, "w") as infofile:
+        with open(self.info_filename, "w") as infofile:
             parser.write(infofile)
 
     @property
-    def info_filname(self):
+    def info_filename(self):
         """ Get the filename of the info file 
         """
         return os.path.join(LAPP_DIR, self.name + ".info")
 
     @property
-    def python_filname(self):
+    def python_filename(self):
         """ Get the python script filename
         """
         return os.path.join(LAPP_DIR, self.name + ".py")
 
     @property
-    def blockly_filname(self):
+    def blockly_filename(self):
         """ Get the blockly script filename
         """
         return os.path.join(LAPP_DIR, self.name + ".by")
@@ -189,8 +192,8 @@ class LampApp(object):
     def exist(self):
         """ check wheter a lamp app exist or not
         """
-        return os.path.isfile(self.python_filname) \
-                and os.path.isfile(self.info_filname)
+        return os.path.isfile(self.python_filename) \
+                and os.path.isfile(self.info_filename)
 
     def create(self):
         """ Create a new lapp
@@ -208,12 +211,12 @@ class LampApp(object):
         if not self.exist():
             raise LappDoNotExist()
         # remove info file
-        os.remove(self.info_filname)
+        os.remove(self.info_filename)
         # destroy python file
-        os.remove(self.python_filname)
+        os.remove(self.python_filename)
         #todo remove blockly file (if needed)
         if self.from_blockly:
-            os.remove(self.blockly_filname)
+            os.remove(self.blockly_filename)
 
     def update(self, new_vals):
         for attr, get_cast, _ in LampApp.INFO_ATTRS:
@@ -262,7 +265,7 @@ class LampApp(object):
         cmd += ["--exec", "/usr/bin/python"]
         cmd += ["--user", "%s" % LAPP_USER]
         cmd += ["--chdir", "%s" % BASEDIR]
-        cmd += ["--", "%s" % self.python_filname]
+        cmd += ["--", "%s" % self.python_filename]
         cmd += ["--pidfile", "%s" % LAPP_PIDFILE]
         cmd += ["--outfile", "%s" % LAPP_OUTFILE]
         cmd += ["--logfile", "%s" % LAPP_LOGFILE]
