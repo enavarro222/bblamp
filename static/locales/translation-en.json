@@ -1,0 +1,22 @@
+{
+    "app": {
+        "name": "BBLamp"
+    },
+
+    "loading":{
+        "title": "BBLamp, loading...",
+        "msg": "Please wait !"
+    },
+
+    "status":{
+        "notrunning": "nothing running",
+        "stop": "Stop",
+        "started": "started"
+    },
+    
+    "lapp":{
+        "save":"Save",
+        "run": "Run",
+        "close":"Close"
+    }
+}

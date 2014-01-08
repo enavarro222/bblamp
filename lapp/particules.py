@@ -11,7 +11,6 @@ class MyLampApp(LampApp):
         self.position = [6, 5, 7, 8, 4, 5, 10]
         self.sens = [1, 1, 1, -1, 1, 1, -1]
         self.period = [15, 15, 20, 40, 80, 20, 92]
-
         
         self.colors = [
             [202,  12, 105],

@@ -5,13 +5,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jslib/toastr.min.css') }}">
+
 <!--        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bblamp.css') }}">-->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bs_bblamp.css') }}">
     </head>
     <body>
         <!-- "app" is the main dom element for the app -->
         <div id="app">
-            <div class="init_load">Application loading...</div>
+            <div class="container">
+                <div class="page-header">
+                    <h1 data-i18n="loading.title">Loading...</h1>
+                </div>
+                <p class="lead" data-i18n="loading.msg">Please wait !
+                </p>
+            </div>
         </div>
 
         
@@ -30,23 +38,28 @@
                     </div>
                     <div class="navbar-collapse">
                         <div id="lapp-menu-view"></div>
-                        <div id="lapp-status-view"></div>
-                        <div id="lapp-run-view"></div>
+                        <form class="nav navbar-right navbar-form form-inline">
+                            <div id="lapp-run-view"></div>
+                            <div id="lapp-status-view"></div>
+                        </form>
                     </div>
                 </div>
             </div>
             
             <div class="container">
                 <div class="row">
-                    <div class="col-md-3" id="side">
+                    <div class="col-md-2" id="side">
                         <div id="lapp-list-view"></div>
                         <div id="new-lapp-view"></div>
                     </div>
                     
-                    <div class="col-md-9" id="main">
-                        <div id="lapp-editor-view">
-                        </div>
-                    </div>
+                    <div class="col-md-10" id="main">
+                    
+                </div>
+            </div>
+            
+            <div id="simu_dashboard">
+                <div class="" id="led_pixels">
                 </div>
             </div>
         </script>
@@ -56,55 +69,70 @@
                 <li class="active dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= name %> <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li <% if (state != 'modified') { %>class="disabled"<% } %> ><a href="#" class="bb_save">Save</a></li>
-                    <li><a href="#" class="bb_run">Run</a></li>
-                    <li><a href="#" class="bb_close">Close</a></li>
-                    <!--<li class="divider"></li>-->
-                    <!--<li class="dropdown-header">Nav header</li>-->
-                    <!--<li><a href="#">Separated link</a></li>-->
-                    <!--<li><a href="#">One more separated link</a></li>-->
+                    <li <% if (state != 'modified') { %>class="disabled"<% } %> ><a href="#" class="bb_save" data-i18n="lapp.save"></a></li>
+                    <li><a href="#" class="bb_run" data-i18n="lapp.run"></a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" class="bb_close" data-i18n="lapp.close"></a></li>
                   </ul>
                 </li>
             </ul>
         </script>
 
         <script id="lapp-run" type="layout">
-            <form class="nav navbar-right navbar-form form-inline">
+            <div class="btn-group">
                 <button class="bb_save_run btn btn-default btn btn-success" type="button">
-                    <% if (modified) { %>Save &amp; Run<% } else { %> Run <% } %>
+                    <% if (modified) { %>
+                        <span data-i18n="lapp.save" /> &amp; <span data-i18n="lapp.run" />
+                    <% } else { %>
+                        <span data-i18n="lapp.run" />
+                    <% } %>
                     '<%= name %>'
                 </button>
-            </form>
+            </div>
         </script>
         
         <script id="lapp-status" type="layout">
-            <form class="nav navbar-right navbar-form form-inline">
-                <div class="btn-group">
-                    <% if (status=="running") { %>
-                      <button type="button" class="bb_stop btn btn-danger">Stop '<%= script_name %>'</button>
-                      <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                            <li class="dropdown-header">
-                                '<%= script_name %>' running
-                            </li>
-                            <li>
-                                <a href="#" class="bb_stop">Stop '<%= script_name %>'</a>
-                            </li>
-                      </ul>
-                    </div>
+            <div class="btn-group">
+                <% if (status=="running") { %>
+                  <button type="button" class="bb_stop btn btn-danger">
+                    <span data-i18n="status.stop"/> '<%= script_name %>'
+                  </button>
+                  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                        <li class="dropdown-header">
+                            '<%= script_name %>' <span data-i18n="status.started"/> <%= start_from %>
+                        </li>
+                        <li>
+                            <a href="#" class="bb_stop"><span data-i18n="status.stop"/> '<%= script_name %>'</a>
+                        </li>
+                  </ul>
                 <% } else { %>
-                      <button type="button" class="disabled btn btn-danger">nothing running</button>
+                      <button type="button" class="disabled btn btn-danger" data-i18n="status.notrunning"></button>
                 <% } %>
-                </div>
-            </form>
+            </div>
+        </script>
+        
+        <script id="lapp-editors" type="layout">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs">
+              <li><a href="#lapp-editor-view" data-toggle="tab">Blocks</a></li>
+              <li><a href="#lapp-source-editor-view" data-toggle="tab">Python</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div id="lapp-editors" class="tab-content">
+              <div class="tab-pane active" id="lapp-editor-view"></div>
+              <div class="tab-pane" id="lapp-source-editor-view"></div>
+            </div>
         </script>
         
         <script id="lapp-ace-editor" type="layout">
             <div id="ace_editor_mask">
                 <div id="ace_editor_container">
+                    <div class="overlay"></div>
                     <pre id="the_ace_editor"></pre>
                 </div>
             </div>
@@ -113,17 +141,188 @@
         <script id="lapp-blockly-editor" type="layout">
             <div id="blockly_editor_mask">
                 <div id="blockly_editor_container">
-                    <pre id="the_blockly_editor" style="height: 480px; width: 600px;"></pre>
+                    <div class="overlay"></div>
+                    <pre id="the_blockly_editor"></pre>
                 </div>
             </div>
             <xml id="blockly_toolbox" style="display: none">
-                <block type="controls_if"></block>
-                <block type="controls_repeat_ext"></block>
-                <block type="logic_compare"></block>
-                <block type="math_number"></block>
-                <block type="math_arithmetic"></block>
-                <block type="text"></block>
-                <block type="text_print"></block>
+                <category name="Logique">
+                    <block type="controls_if"/>
+                    <block type="logic_compare"/>
+                    <block type="logic_operation"/>
+                    <block type="logic_negate"/>
+                    <block type="logic_boolean"/>
+                    <block type="logic_null"/>
+                    <block type="logic_ternary"/>
+                </category>
+                <category name="Boucles">
+                    <block type="controls_repeat_ext">
+                        <value name="TIMES">
+                            <block type="math_number">
+                                <field name="NUM">10</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="controls_whileUntil"/>
+                    <block type="controls_for">
+                        <value name="FROM">
+                            <block type="math_number">
+                                <field name="NUM">1</field>
+                            </block>
+                        </value>
+                        <value name="TO">
+                            <block type="math_number">
+                                <field name="NUM">10</field>
+                            </block>
+                        </value>
+                        <value name="BY">
+                            <block type="math_number">
+                                <field name="NUM">1</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="controls_forEach"/>
+                    <block type="controls_flow_statements"/>
+                </category>
+                <category name="Math">
+                    <block type="math_number"/>
+                    <block type="math_arithmetic"/>
+                    <block type="math_single"/>
+                    <block type="math_trig"/>
+                    <block type="math_constant"/>
+                    <block type="math_number_property"/>
+                    <block type="math_change">
+                        <value name="DELTA">
+                            <block type="math_number">
+                                <field name="NUM">1</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="math_round"/>
+                    <block type="math_on_list"/>
+                    <block type="math_modulo"/>
+                    <block type="math_constrain">
+                        <value name="LOW">
+                            <block type="math_number">
+                                <field name="NUM">1</field>
+                            </block>
+                        </value>
+                        <value name="HIGH">
+                            <block type="math_number">
+                                <field name="NUM">100</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="math_random_int">
+                        <value name="FROM">
+                            <block type="math_number">
+                                <field name="NUM">1</field>
+                            </block>
+                        </value>
+                        <value name="TO">
+                            <block type="math_number">
+                                <field name="NUM">100</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="math_random_float"/>
+                </category>
+                <category name="Texte">
+                    <block type="text"/>
+                    <block type="text_join"/>
+                    <block type="text_append">
+                        <value name="TEXT">
+                            <block type="text"/>
+                        </value>
+                    </block>
+                    <block type="text_length"/>
+                    <block type="text_isEmpty"/>
+                    <block type="text_indexOf">
+                        <value name="VALUE">
+                            <block type="variables_get">
+                                <field name="VAR">texte</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="text_charAt">
+                        <value name="VALUE">
+                            <block type="variables_get">
+                                <field name="VAR">texte</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="text_getSubstring">
+                        <value name="STRING">
+                            <block type="variables_get">
+                                <field name="VAR">texte</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="text_changeCase"/>
+                    <block type="text_trim"/>
+                    <block type="text_print"/>
+                    <block type="text_prompt"/>
+                </category>
+                <category name="Listes">
+                    <block type="lists_create_empty"/>
+                    <block type="lists_create_with"/>
+                    <block type="lists_repeat">
+                        <value name="NUM">
+                            <block type="math_number">
+                                <field name="NUM">5</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="lists_length"/>
+                    <block type="lists_isEmpty"/>
+                    <block type="lists_indexOf">
+                        <value name="VALUE">
+                            <block type="variables_get">
+                                <field name="VAR">liste</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="lists_getIndex">
+                        <value name="VALUE">
+                            <block type="variables_get">
+                                <field name="VAR">liste</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="lists_setIndex">
+                        <value name="LIST">
+                            <block type="variables_get">
+                                <field name="VAR">liste</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="lists_getSublist">
+                        <value name="LIST">
+                            <block type="variables_get">
+                                <field name="VAR">liste</field>
+                            </block>
+                        </value>
+                    </block>
+                </category>
+                <category name="Couleur">
+                    <block type="colour_picker"/>
+                    <block type="colour_random"/>
+                    <block type="colour_rgb"/>
+                    <block type="colour_blend"/>
+                </category>
+                <category name="Variables" custom="VARIABLE"/>
+                <category name="Proc&#xE9;dures" custom="PROCEDURE"/>
+                <category name="LampApp">
+                    <block type="lapp_every">
+                        <value name="LOOPTIME">
+                            <block type="math_number">
+                                <field name="NUM">10</field>
+                            </block>
+                        </value>
+                    </block>
+                    <block type="leds_turn_on" />
+                    <block type="leds_turn_off" />
+                </category>
             </xml>
         </script>
 
@@ -145,26 +344,42 @@
             </li>
         </script>
 
+        <script id="led-pixels" type="layout">
+            <ul class="led_pixels">
+                <% _.each(colors, function(color){ %>
+                    <li style="background-color: #<%= color %>">&nbsp;</li>
+                <% }); %>
+            </ul>
+        </script>
+
         <!-- Lib -->
         <script type="text/javascript" src="{{ url_for('static', filename='jslib/jquery-1.10.2.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/i18next-1.7.1.min.js') }}"></script>
+<!--        <script type="text/javascript" src="{{ url_for('static', filename='jslib/i18next-1.7.1.js') }}"></script>-->
 
         <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/bootbox.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/toastr.min.js') }}"></script>
 
         <script type="text/javascript" src="{{ url_for('static', filename='jslib/underscore-min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='jslib/backbone-min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='jslib/backbone.layoutmanager.js') }}"></script>
 
+        <script type="text/javascript" src="{{ url_for('static', filename='jslib/vagueTime.js') }}" charset="utf-8"></script>
+
         <script type="text/javascript" src="{{ url_for('static', filename='ace/ace.js') }}" charset="utf-8"></script>
 
         <script type="text/javascript" src="{{ url_for('static', filename='blockly/blockly_compressed.js') }}""></script>
         <script type="text/javascript" src="{{ url_for('static', filename='blockly/blocks_compressed.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='blockly/python_compressed.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='blockly/msg/js/en.js') }}"></script>
-
+        <script type="text/javascript" src="{{ url_for('static', filename='blockly/msg/js/fr.js') }}"></script>
 
         <!-- Scripts -->
         <script type="text/javascript" src="{{ url_for('static', filename='utils.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='lapp_models.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='lapp_views.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='simu.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='lapp.js') }}"></script>
 
     </body>

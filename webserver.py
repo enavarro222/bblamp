@@ -12,9 +12,13 @@ from gevent.queue import Queue
 from flask import Flask, Response
 from flask import render_template, jsonify
 
+from utils import ServerSentEvent
+
 from api import lapps
 from api import get_lapp_status, LAPP_LOGFILE, LAPP_OUTFILE
 from errors import BBLampException
+
+from simulate import simu
 
 # the Flask app
 bblamp_app = Flask(__name__)
@@ -23,33 +27,11 @@ bblamp_app.debug = True
 # app API
 bblamp_app.register_blueprint(lapps, url_prefix="/v1")
 
+# lamp simulation API
+bblamp_app.register_blueprint(simu, url_prefix="/simu/v1")
 
 # app shared state variables
 subscriptions = []
-
-#-------------------------------------------------------------------------------
-# SSE "protocol
-class ServerSentEvent(object):
-    """ SSE "protocol" is described here: 
-    https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events
-    """
-
-    def __init__(self, data):
-        self.data = data
-        self.event = None
-        self.id = None
-        self.desc_map = {
-            self.data : "data",
-            self.event : "event",
-            self.id : "id"
-        }
-
-    def encode(self):
-        if not self.data:
-            return ""
-        lines = ["%s: %s" % (v, k) 
-                 for k, v in self.desc_map.iteritems() if k]
-        return "%s\n\n" % "\n".join(lines)
 
 
 #-------------------------------------------------------------------------------
@@ -118,12 +100,24 @@ def monitor_logging_file(filename, output_fct):
                     # check the file still exist
                     # cf: http://stackoverflow.com/a/12690767
                     if os.fstat(in_file.fileno()).st_nlink == 0:
-                        break
+                        break # try to reopen it if it has been deleted
                     # try to read next line
+                    log_line = in_file.readline()
+                    # wait short time to be sure to not miss next "same log line"
+                    gevent.sleep(0.001)
+                    last_pos = in_file.tell()
                     nextline = in_file.readline()
-                    if nextline:
-                        output_fct(nextline)
-                    # wait some time
+                    while not (nextline == "" or nextline.startswith("LampApp")): # = not a new log line
+                        log_line += nextline
+                        # wait short time to be sure to not miss next "same log line"
+                        gevent.sleep(0.001)
+                        last_pos = in_file.tell()
+                        nextline = in_file.readline()
+                    if log_line != "":
+                        # push log_line
+                        output_fct(log_line)
+                        # and seek back to the next log line (seek to the same position)
+                        in_file.seek(last_pos)
                     gevent.sleep(0.1)
         except IOError as error:
             # file doesn't exist or not
@@ -142,8 +136,8 @@ def monitor_lapp_outfile():
 def monitor_lapp_status():
     while True:
         last_status = get_lapp_status()
-        while last_status == get_lapp_status():
-                gevent.sleep(0.4)
+        while last_status["hash"] == get_lapp_status()["hash"]:
+            gevent.sleep(0.4)
         new_lapp_status()
         gevent.sleep(0.4)
 

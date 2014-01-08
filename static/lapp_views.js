@@ -1,5 +1,69 @@
 /*global Backbone, $, _ */
 var Views = {};
+/******************************************************************************/
+/* lapp editors view 
+*/
+Views.LappEditorsView = Backbone.Layout.extend({
+    template: "#lapp-editors",
+    
+    events: {
+        'show.bs.tab a[data-toggle="tab"]': "tabClose",
+        'shown.bs.tab a[data-toggle="tab"]': "tabOpen",
+    },
+    
+    initialize: function(){
+        _(this).bindAll('tabOpen', 'tabClose');
+    },
+    
+    log: function(msg) {
+        console.log('<EDITORS:'+ this.model.id + '> '+ msg);
+    },
+    
+    afterRender: function() {
+        if(this.model.get("from_blockly")){
+            this.$('.nav-tabs a[href="#lapp-editor-view"]').tab('show');
+        } else {
+            this.$('.nav-tabs a[href="#lapp-source-editor-view"]').tab('show');
+        }
+    },
+    
+    tabClose: function(event) {
+        // close if needed
+        if(event.relatedTarget) {
+            var toclose = $(event.relatedTarget).attr('href');
+            this.log("close:" + toclose);
+            this.removeView(toclose);
+        }
+    },
+    
+    tabOpen: function(event) {
+        // open the tab
+        var tabid = $(event.target).attr('href');
+        this.log("open:" + tabid);
+        switch(tabid){
+            case "#lapp-editor-view":
+                this.setView("#lapp-editor-view", new Views.LappBlocklyEditorView({
+                    model: this.model,
+                })).render();
+                break;
+            case "#lapp-source-editor-view":
+                this.setView("#lapp-source-editor-view", new Views.LappAceEditorView({
+                    model: this.model,
+                })).render();
+                break;
+        };
+    },
+    
+    /*beforeRender: function() {
+        this.setView("#lapp-editor-view", new Views.LappBlocklyEditorView({
+            model: this.model,
+        })).render();
+        this.setView("#lapp-source-editor-view", new Views.LappAceEditorView({
+            model: this.model,
+        })).render();
+        return this;
+    },*/
+});
 
 /******************************************************************************/
 /* lapp python code editor (ACE)
@@ -7,13 +71,17 @@ var Views = {};
 Views.LappAceEditorView = Backbone.Layout.extend({
     template: "#lapp-ace-editor",
 
+    events: {
+        "dblclick .overlay": "makeEditable",
+    },
+    
     log: function(msg) {
         console.log('<ACE_EDITOR:'+ this.model.id + '> '+ msg);
     },
 
     initialize: function() {
         this.log("init");
-        _(this).bindAll('modelChanged', 'updateEditable', 'codeModified', 'setEditorHeight');
+        _(this).bindAll('modelChanged', 'updateEditable', 'codeModified', 'setEditorHeight', 'makeEditable');
         this.listenTo(this.model, 'change:py_code', this.modelChanged);
         this.listenTo(this.model, 'change:from_blockly', this.updateEditable);
     },
@@ -26,20 +94,37 @@ Views.LappAceEditorView = Backbone.Layout.extend({
         }
     },
     
-    updateEditable: function() {
-        this.editor.setReadOnly(this.model.get("from_blockly"));
+    // check wheter the code is editable or not and change the view
+    updateEditable: function(event) {
+        var readonly = this.model.get("from_blockly");
+        this.editor.setReadOnly(readonly);
+        if(readonly){
+            this.$(".overlay").slideDown(event ? 400 : 0); //cmt: if event is undefined (false) it is the initial setup so no annimation
+        } else {
+            this.$(".overlay").slideUp(event ? 400 : 0);
+        }
+    },
+    
+    //TODO: factorize that somewhere else
+    // change the model to make the blockly code editable
+    makeEditable: function(){
+        var self = this;
+        bootbox.confirm({
+            "title": "Are you sure ?",
+            "message":"If you edit directly the python code, you will no more be able to modify the blocks.",
+            "callback":function(result) {
+                if(result){
+                    self.model.set({"from_blockly": false})
+                }
+            }
+        }); 
     },
     
     codeModified: function() {
         var new_code = this.editor.getValue();
         this.log("py_code changed !");
         if(!this.model.get("from_blockly")){
-            this.model.set(
-                {
-                    'py_code': new_code,
-                },
-                {'from': this}
-            );
+            this.model.set({'py_code': new_code}, {'from': this});
         } else {
             this.log("direct change of py code wheras it is a blockly app")
         }
@@ -73,7 +158,8 @@ Views.LappAceEditorView = Backbone.Layout.extend({
     setEditorHeight: function (){
         var lastLine = this.$("#the_ace_editor .ace_gutter-cell:last");
         var neededHeight = lastLine.position().top + lastLine.outerHeight() + 40;
-        var minimalHeight = window.innerHeight - $("#head").height() - 40;
+        var minimalHeight = window.innerHeight
+                - 10 - this.$("#ace_editor_mask").offset().top;
         //this.log("change editor height : " + neededHeight + " vs " + minimalHeight);
         neededHeight = Math.max(neededHeight, minimalHeight);
         this.$("#ace_editor_mask").height(neededHeight);
@@ -87,15 +173,20 @@ Views.LappAceEditorView = Backbone.Layout.extend({
 Views.LappBlocklyEditorView = Backbone.Layout.extend({
     template: "#lapp-blockly-editor",
 
+    events: {
+        "dblclick .overlay": "makeEditable",
+    },
+
     log: function(msg) {
         console.log('<BLK_EDITOR:'+ this.model.id + '> '+ msg);
     },
 
     initialize: function() {
         this.log("init");
-        _(this).bindAll('modelChanged', 'codeModified', 'setEditorHeight');
+        _(this).bindAll('modelChanged', 'codeModified', 'setEditorHeight', 'updateEditable', 'makeEditable');
         this.listenTo(this.model, 'change:by_code', this.modelChanged);
         this.listenTo(this.model, 'change:from_blockly', this.updateEditable);
+        // warning. some binding are done after rendering
     },
 
     /* returns the xml code of the current blockly app */
@@ -103,6 +194,12 @@ Views.LappBlocklyEditorView = Backbone.Layout.extend({
         var xml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
         var xml_text = Blockly.Xml.domToText(xml);
         return xml_text;
+    },
+    
+    /* générate python code from blocks */
+    generatePythonCode: function() {
+        var code = Blockly.Python.workspaceToCode();
+        return code;
     },
     
     setBlocklyCode: function(xml_text) {
@@ -123,8 +220,30 @@ Views.LappBlocklyEditorView = Backbone.Layout.extend({
         }
     },
     
-    updateEditable: function() {
-        Blockly.readOnly = !this.model.get("from_blockly");
+    // check wheter the code is editable or not and change the view
+    updateEditable: function(event) {
+        var readonly = !this.model.get("from_blockly");
+        Blockly.readOnly = readonly;
+        if(readonly){
+            this.$(".overlay").slideDown(event ? 400 : 0);
+        } else {
+            this.$(".overlay").slideUp(event ? 400 : 0);
+        }
+    },
+    
+    //TODO: factorize that somewhere else
+    // change the model to make the blockly code editable
+    makeEditable: function(){
+        var self = this;
+        bootbox.confirm({
+            "title": "Are you sure ?",
+            "message":"If you edit the blocks the python code will be lost.",
+            "callback":function(result) {
+                if(result){
+                    self.model.set({"from_blockly": true})
+                }
+            }
+        }); 
     },
     
     codeModified: function() {
@@ -132,10 +251,12 @@ Views.LappBlocklyEditorView = Backbone.Layout.extend({
         //TODO: ckeck if realy different
         if(this.model.get("from_blockly")){
             
-            var new_code = this.getBlocklyCode();
+            var by_code = this.getBlocklyCode();
+            var py_code = this.generatePythonCode();
             this.model.set(
                 {
-                    'by_code': new_code,
+                    'by_code': by_code,
+                    'py_code': py_code,
                 },
                 {'from': this}
             );
@@ -151,13 +272,16 @@ Views.LappBlocklyEditorView = Backbone.Layout.extend({
     },
     
     afterRender: function(){
+        this.setEditorHeight();
+        //BlocklyApps.init();
         this.log("create the Blockly editor");
         // create the blockly editor
         Blockly.inject(
             document.getElementById('the_blockly_editor'),
             {
                 path: './static/blockly/', //TODO: set it with a template
-                toolbox: document.getElementById('blockly_toolbox')
+                toolbox: document.getElementById('blockly_toolbox'),
+                scrollbars: true,
             }
         );
         // set the code
@@ -165,33 +289,38 @@ Views.LappBlocklyEditorView = Backbone.Layout.extend({
         if(this.model.get('from_blockly')){
             this.setBlocklyCode(this.model.get('by_code'));
         }
-        //this.setEditorHeight();
         // bind it
         this.listenTo(
             asEvents(Blockly.mainWorkspace.getCanvas()),
             'blocklyWorkspaceChange',
             this.codeModified
         )
-        //this.listenTo(asEvents(window), "resize", this.setEditorHeight);
+        this.listenTo(asEvents(window), "resize", this.setEditorHeight);
         return this;
     },
     
     setEditorHeight: function (){
-        //XXX need translation
-        var lastLine = this.$("#the_ace_editor .ace_gutter-cell:last");
-        var neededHeight = lastLine.position().top + lastLine.outerHeight();
-        var minimalHeight = window.innerHeight - $("#head").height() - 8;
-        //this.log("change editor height : " + neededHeight + " vs " + minimalHeight);
-        neededHeight = Math.max(neededHeight, minimalHeight);
-        this.$("#ace_editor_mask").height(neededHeight);
-    },
+        var minimalHeight = window.innerHeight 
+                - 10 - this.$("#blockly_editor_mask").offset().top;
+        minimalHeight = Math.max(100, minimalHeight);
+        var mask = this.$("#blockly_editor_mask");
+        mask.height(minimalHeight+"px")
+        var width = mask.width() - 6;
+        var height = mask.height() - 6;
+        //set new size
+        this.log(width + " x " +height);
+        var editor = this.$("#the_blockly_editor");
+        editor.width(width+"px");
+        editor.height(height+"px");
+        return
+        },
 });
 
 
 /******************************************************************************/
 /* "Save and Run" lapp view
 */
-Views.LappRunView = Backbone.Layout.extend({
+Views.LappRunView = i18nLayout.extend({
     template: "#lapp-run",
 
     events: {
@@ -215,7 +344,7 @@ Views.LappRunView = Backbone.Layout.extend({
     },
 
     saveRun: function() {
-        if(this.model.state == "modified"){
+        if(this.model.isModified()){
             this.log("save !");
             this.model.save();
         }
@@ -226,7 +355,7 @@ Views.LappRunView = Backbone.Layout.extend({
 /******************************************************************************/
 /* lapp menu view
 */
-Views.LappMenuView = Backbone.Layout.extend({
+Views.LappMenuView = i18nLayout.extend({
     template: "#lapp-menu",
 
     events: {
@@ -241,7 +370,7 @@ Views.LappMenuView = Backbone.Layout.extend({
     },
 
     log: function(msg) {
-        console.log('<LAPP_TITLE_VIEW:'+ this.model.id + '> '+ msg);
+        console.log('<LAPP_MENU_VIEW:'+ this.model.id + '> '+ msg);
     },
 
     serialize: function() {
@@ -250,6 +379,7 @@ Views.LappMenuView = Backbone.Layout.extend({
     },
 
     save: function() {
+        this.log("may save !");
         if(this.model.isModified()){
             this.log("save !");
             this.model.save();
@@ -257,13 +387,12 @@ Views.LappMenuView = Backbone.Layout.extend({
     },
     
     run: function() {
-        if(this.model.state == "modified"){
-            this.save();
-        }
+        this.save();
         this.model.run()
     },
     
     close: function() {
+        //XXX: action on the model (unselect)
         BBL.router.navigate("/", {trigger: true});
     }
 });
@@ -276,7 +405,7 @@ Views.LappListItemView = Backbone.Layout.extend({
 
     //note: the real href is indicated however it is catched by JS
     template: "#lapp-list-item",
-
+    
     events: {
         'click a': 'click',
     },
@@ -370,7 +499,7 @@ Views.NewLappView = Backbone.Layout.extend({
 /******************************************************************************/
 /* Lapp Status view
 */
-Views.LappStatusView = Backbone.Layout.extend({
+Views.LappStatusView = i18nLayout.extend({
     keep: true, // LayoutManager option: the view is not deleted after rendering
     
     template: "#lapp-status",
@@ -392,7 +521,16 @@ Views.LappStatusView = Backbone.Layout.extend({
     serialize: function() {
         this.log("serialize");
         var data = this.model.attributes;
-        return data
+        //var now = new Date(this.model.get("date"));
+        var now = new Date();
+        if(this.model.get("status") == "running"){
+            data.start_from = vagueTime.get({
+                "to": now,
+                "from": new Date(this.model.get("start_time")),
+                "lang": i18n.lng().split("-")[0]
+            });
+        }
+        return data;
     },
     
     stop: function(){

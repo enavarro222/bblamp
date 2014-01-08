@@ -15,11 +15,19 @@ This project is very young but in (active) development. Feel free to contact me 
 
 Require
 ------
+
+python:
 * flask
 * gevent >= 1.0 (https://pypi.python.org/pypi/gevent)
+* requests
+* sseclient (https://pypi.python.org/pypi/sseclient)
+
+javascript:
 * jquery
 * underscore.js
 * backbone.js
+* twitter bootstrap
+* bootboxjs
 * ace.js (source code editor)
 * blockly
 
@@ -103,43 +111,68 @@ Lamp App web editor/manager
 TODO
 ----
 
-- [ ] UI: manage log and output, list, clean, pop-up ?
-- [ ] UI: switch between two editors
-- [ ] UI: blockly: auto-resize
-- [ ] UI: blockly: python translation (python read-only)
-- [ ] UI: blockly: Lapp basic custom block
-- [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice
+- [ ] UI: blockly: fork => svn export & git add **H**
+- [ ] UI: blockly: add "setup" block **H**
+- [ ] UI: blockly: add "lapp_every_ms"
+- [ ] UI: blockly: add "pause of TIME milliseconds"
+- [ ] UI: blockly: make "block bags"
+- [ ] UI: blockly: add color builer from HSV
+- [ ] UI: prevent quit without save  **H**
+- [ ] UI: log & output: manage the history, list, clear
+- [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice  **H**
 - [ ] UI: run/stop/etc... check ajax call error
-- [ ] UI: run when already running ...
-- [ ] UI: add remove an app (with confirmation)
-- [ ] UI: manage lapp metadata
-- [ ] UI: ace editor: autocompletion
+- [ ] UI: remove an app (with confirmation)
+- [ ] UI: discard changes (with confirmation)
+- [ ] UI: manage lapp metadata (author, comment)
 - [ ] UI: (BUG) event may deconect
-- [ ] UI: better front page...
-- [ ] UI: lapp started time "since" : https://github.com/philbooth/vagueTime.js
-- [ ] UI: use require.js
-- [ ] server: get SyntaxError
+- [ ] UI: blockly: i18n set language from i18next
+- [ ] UI: blockly: i18n custom blocks
+- [ ] UI: remaster the layout : editor full width, except when simulator on right
+- [ ] UI: front page: list of apps in full width
+- [ ] UI: unified run/status menu View (with both model = status, collection = lapp_collection)
+- [ ] UI: unactivate run when already running ...
 - [ ] server: integration with nginx (http://salem.harrache.info/application-wsgi-avec-gevent-et-nginx.html)
 - [ ] server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
 - [ ] server: clean start/stop/status responses (API)
-- [ ] server: manage (simply) concurrent edition
-- [ ] server: store lapp in a local git repo (so store history)
-- [ ] lapp: move to event based ! (every k sec, on button pressed, etc...)
-- [ ] lapp: reset led on exit
+- [ ] server/lapp: 
+- [ ] lapp: lamp start led id at 1 not at 0
+- [ ] lapp: add a push button (simu first)
+- [ ] lapp: add push button (GPIO)
+- [ ] lapp: fix issue with GPIO not as root
+- [ ] lapp: GPIO how to do with interupt ?
 - [ ] lapp: add kill signal catch to lapp, log it correctly before to quit
 - [ ] lapp: add i2c sensors
 - [ ] lapp: add DHT22 sensors
-- [ ] lapp: add GPIO button
+
+
+Long or middle term:
+- [ ] server: get lapp SyntaxError back to UI
+- [ ] UI: use require.js
+- [ ] UI: editor ace: autocompletion
+- [ ] server: manage (simply) concurrent edition
+- [ ] server: store lapp in a local git repo (so store history)
 - [ ] lapp/server: manage hardware (what present, what needed)
-- [ ] lapp: fix issue with GPIO not as root
-- [ ] lapp: how to do with interupt ?
-- [ ] lapp: manage start on boot
-- [ ] lapp: ledPixel better color management
-- [ ] lapp: make a kivy to develop and test apps when no hardware
+- [ ] install a demo version on a public server (with pswd)
 
-
+- [x] lapp: move to event based ! (every k sec, on button pressed, etc...)
+- [x] lapp: reset led on exit
+- [x] UI: i18n avec i18next
+- [x] UI: lapp started time "since" : https://github.com/philbooth/vagueTime.js
+- [x] UI: change editor style when readonly
+- [x] UI: log & outout popup
+- [x] UI: switch between two editors
+- [x] UI: change app mode (from_blockly)
+- [x] UI: confirmation and error msg with http://bootboxjs.com/
+- [x] UI: blockly: **BUG** allow more than one "every" block
+- [x] UI: blockly: change all code generation for colors
+- [x] UI: blockly: auto-resize
 - [x] UI: blockly: first integration (no translation, no save/load)
 - [x] UI: blockly: save/load
+- [x] UI: blockly: python translation (python read-only)
+- [x] UI: blockly: Lapp basic custom block
+- [x] UI: blockly: add "count for "i" in ..."
+- [x] UI: blockly: change blocks color (more saturation) -> same than bootstrap (cf core/blockly.js:79)
+- [x] UI: blockly: add "trun on light ID to color COLOR", "trun off light ID"
 - [x] UI: use twitter bootstrap
 - [x] UI: (BUG) ace editor: height error when open a lapp
 - [x] UI: reorganise views in a different js file

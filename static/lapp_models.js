@@ -34,7 +34,7 @@ var LappModel = Backbone.Model.extend({
 
     /* update the model state
      * 
-     * 'opitons' are passed to model.set function
+     * 'options' are passed to model.set function
      */
     changeState: function(new_state, options) {
         var old_state = this.get("state");
@@ -141,6 +141,8 @@ var LappStatusModel = Backbone.Model.extend({
         // suscribe to server event
         this.evtSrc = new EventSource("/log/subscribe");
         this.evtSrc.onmessage = this.serverEvent
+        this.logs = new Backbone.Collection;
+        this.outputs = new Backbone.Collection;
     },
 
     serverEvent: function(event){
@@ -152,9 +154,12 @@ var LappStatusModel = Backbone.Model.extend({
             case "status":
                 this.clear({"silent":true});
                 this.set(data.data);
+                break;
             case "log":
+                this.logs.add({"msg":data.data})
                 break;
             case "output":
+                this.outputs.add({"msg":data.data})
                 break;
             default:
                 throw SyntaxError("Unknow msg type: '" + data.dtype + "' !");
@@ -163,6 +168,8 @@ var LappStatusModel = Backbone.Model.extend({
 
    // The Twitter Search API returns tweets under "results".
     parse: function(response) {
+        response["log"] = [];
+        response["output"] = []
         return response;
     }
 });

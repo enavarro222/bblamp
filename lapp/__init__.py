@@ -1,9 +1,15 @@
 #-*- coding:utf-8 -*-
 import os
+import sys
 import logging
 import argparse
+import signal
 
-from ledpixels import LedPixelsFileStub as LedPixels
+import gevent
+
+#from ledpixels import LedPixelsFileStub as LedPixels
+from ledpixels import LedPixelsWebSimu as LedPixels
+
 from utils import read_lapp_pidfile, write_lapp_pidfile
 
 class LampApp(object):
@@ -18,20 +24,44 @@ class LampApp(object):
         #TODO make it configurable from "run"
         # init leds
         self.lamp = LedPixels(self.NBPIXEL)
-        self.lamp.all_off()
-        self.lamp.flush()
+        self.lamp.turn_off()
+        
+        self._to_spawn = []
 
-    def setup(self):
-        raise NotImplementedError()
-
-    def loop(self):
-        raise NotImplementedError()
-
+    def every(self, time):
+        """ Function decorator to declare an function to run every indicaded
+        """
+        def every_deco(fn):
+            def run_every():
+                while True:
+                    try:
+                        fn()
+                    except Exception as err:
+                        self.log.exception("uncaught exception:")
+                        break
+                    gevent.sleep(time)
+            self._to_spawn.append(run_every)
+            return run_every
+        return every_deco
+    
+    def on(self, obj, event):
+        """
+        """
+        def on_deco(fn):
+            return fn
+        return on_deco
+    
     def msg(self, msg):
-        print(msg)
+        """ print a message
+        """
         if self._stdout_filemane:
             with open(self._stdout_filemane, "a") as stdout:
                 stdout.write("%s\n" % msg)
+
+    def on_exit(self):
+        if self.lamp:
+            self.lamp.turn_off()
+        sys.exit()
 
     def run(self):
         """ Run the lapp, ie:
@@ -45,18 +75,21 @@ class LampApp(object):
         * call self.setup()
         * in a infinite loop, call self.loop()
         """
+        # clean all at exit
+        signal.signal(signal.SIGTERM, lambda signum, frame: self.on_exit())
         # cmd line argument parser
         parser = argparse.ArgumentParser(description='bb-lamp App.')
+        outdir = "./lapp_output/"
         parser.add_argument(
-            '--logfile', dest='logfile', type=str, default="./lapp.log",
+            '--logfile', dest='logfile', type=str, default=outdir+"/lapp.log",
             help='path of the logging file'
             )
         parser.add_argument(
-            '--outfile', dest='outfile', type=str, default="./lapp.out",
+            '--outfile', dest='outfile', type=str, default=outdir+"/lapp.out",
             help='path for the output (print) file'
             )
         parser.add_argument(
-            '--pidfile', dest='pidfile', type=str, default="./lapp.pid",
+            '--pidfile', dest='pidfile', type=str, default=outdir+"/lapp.pid",
             help='path of the PID file'
             )
         args = parser.parse_args()
@@ -74,7 +107,7 @@ class LampApp(object):
         fhandler.setLevel(logging.DEBUG)
         # create formatter and add it to the handlers
         formatter = logging.Formatter(
-                '%(asctime)s:%(name)s:%(levelname)s:%(message)s'
+                '%(name)s:%(asctime)s:%(levelname)s:%(message)s'
             )
         fhandler.setFormatter(formatter)
         self.log.addHandler(fhandler)
@@ -84,9 +117,8 @@ class LampApp(object):
             ## out file for self.msg
             self._stdout_filemane = args.outfile
             ## run the lapp itself
-            self.setup()
-            while True:
-                self.loop()
+            jobs = [gevent.spawn(fn) for fn in self._to_spawn]
+            gevent.joinall(jobs)
         except Exception:
             self.log.exception("uncaught exception:")
             raise

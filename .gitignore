@@ -1,11 +1,10 @@
 # custom
 ace-builds/
 static/ace
-blockly/
-static/blockly
 bootstrap/
 static/bootstrap
 lapp_output/
+lapp/*
 
 # std
 *.py[cod]

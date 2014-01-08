@@ -2,6 +2,32 @@
 import os
 from datetime import datetime
 
+#-------------------------------------------------------------------------------
+# SSE "protocol
+class ServerSentEvent(object):
+    """ SSE "protocol" is described here: 
+    https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events
+    """
+
+    def __init__(self, data):
+        self.data = data
+        self.event = None
+        self.id = None
+        self.desc_map = {
+            self.data : "data",
+            self.event : "event",
+            self.id : "id"
+        }
+
+    def encode(self):
+        if not self.data:
+            return ""
+        lines = ["%s: %s" % (v, k) 
+                 for k, v in self.desc_map.iteritems() if k]
+        return "%s\n\n" % "\n".join(lines)
+
+#-------------------------------------------------------------------------------
+
 def pid_is_running(pid):
     """
     Return pid if pid is still going.

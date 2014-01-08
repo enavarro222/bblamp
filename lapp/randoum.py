@@ -19,7 +19,7 @@ class MyLampApp(LampApp):
 
         #colorsys.hls_to_rgb(h, l, s)
         self.saturation = 0.7
-        self.light = 0.1
+        self.light = 0.4
         
         self.colors = [
             randColor(self.light, self.saturation, mu=0)
@@ -41,7 +41,6 @@ class MyLampApp(LampApp):
             color = self.colors[k]
             self.lamp.set_color(k, *color)
             #self.lamp.switch_on(self.position[k])
-            
 
         self.lamp.flush()
         time.sleep(0.05)

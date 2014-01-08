@@ -3,6 +3,7 @@ import os
 import subprocess
 import glob
 import json
+from datetime import datetime
 
 from flask import Blueprint
 from flask import request, abort, jsonify
@@ -125,8 +126,6 @@ class LampApp(object):
     def by_code(self):
         """ reads the blokly code of the lapp
         """
-        if not self.from_blockly:
-            raise ValueError("This lapp is not build using blockly")
         if not os.path.isfile(self.blockly_filename):
             #XXX: add log warning
             self.by_code = ""
@@ -138,8 +137,6 @@ class LampApp(object):
     def by_code(self, by_code):
         """ writes a new version of the blockly code of the lapp
         """
-        if not self.from_blockly:
-            raise ValueError("This lapp is not build using blockly")
         with open(self.blockly_filename, "w") as byfile:
             byfile.write(by_code)
 
@@ -282,9 +279,10 @@ class LampApp(object):
                 env=varenv
             )
         output, error = proc.communicate()
-        #print output
-        #print error
+        print output
+        print error
         retcode = proc.poll()
+        print retcode
         if retcode != 0:
             raise RuntimeError(error)
 
@@ -382,9 +380,11 @@ def get_lapp_status():
     output = {}
     output["status"] = "stopped"
     lappinfo = read_lapp_pidfile(LAPP_PIDFILE)
+    output["hash"] = hash(str(lappinfo))
     if lappinfo is not None:
         output.update(lappinfo)
         output["status"] = "running"
+        output["date"] = datetime.now().isoformat()
     return output
 
 @lapps.route("/ctrl/status")

@@ -10,12 +10,6 @@ get-ace:
 install-ace:
 	cd static && ln -s ../ace-builds/src-min-noconflict ./ace
 
-get-blockly:
-	svn checkout http://blockly.googlecode.com/svn/trunk/ ./blockly
-
-install-blockly:
-	cd static && ln -s ../blockly ./
-
 get-bootstrap:
 	wget https://github.com/twbs/bootstrap/releases/download/v3.0.3/bootstrap-3.0.3-dist.zip
 	unzip bootstrap-3.0.3-dist.zip

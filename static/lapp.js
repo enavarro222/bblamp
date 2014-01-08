@@ -43,13 +43,21 @@ var LampAppRouter = Backbone.Router.extend({
 LampAppMainView = Backbone.Layout.extend({
     template: "#main-layout",
     
+    events: {
+        "click a.navbar-brand": "index",
+    },
+    
     initialize: function() {
-        _(this).bindAll("lapp_selected");
+        _(this).bindAll("lapp_selected", "index");
         this.listenTo(this.collection, 'change:selected', this.lapp_selected);
     },
 
     log: function(msg) {
         console.log('[main_view] ' + msg);
+    },
+
+    index: function(){
+        BBL.router.navigate("/", {trigger: true});
     },
 
     /* callback when a lapp is selected
@@ -58,35 +66,38 @@ LampAppMainView = Backbone.Layout.extend({
         if(value){ // a lapp is selected
             this.log("lapp selected");
             // setup the view
-            this.setView("#lapp-editor-view", new Views.LappAceEditorView({
+            this.setView("#main", new Views.LappEditorsView({
                 model: this.collection.selected,
             })).render();
-//            this.setView("#lapp-editor-view", new Views.LappBlocklyEditorView({
-//                model: this.collection.selected,
-//            })).render();
-            this.setView("#lapp-run-view", new Views.LappRunView({
-                model: this.collection.selected,
-            })).render();
+            
             this.setView("#lapp-menu-view", new Views.LappMenuView({
+                model: this.collection.selected,
+            })).render();
+
+            this.setView("#lapp-run-view", new Views.LappRunView({
                 model: this.collection.selected,
             })).render();
         } else { // lapp is un-selected
             this.log("lapp un-selected");
-            this.removeView("#lapp-editor-view");
-            this.removeView("#lapp-run-view");
+            this.removeView("#main");
             this.removeView("#lapp-menu-view");
+            this.removeView("#lapp-run-view");
         }
     }
 });
 
 
 /******************************************************************************/
-BBL.init = function() {
+BBL.init = function(t) {
+    // 't' is the i18next translation method
+    
     // common setup
     // Models
     BBL.lapp_collection = new LappCollection();
     BBL.status_model = new LappStatusModel();
     BBL.status_model.fetch();
+
+    BBL.simu = new LampSimu.Model()
 
     // Views
     // setup the main view
@@ -102,16 +113,45 @@ BBL.init = function() {
         collection: BBL.lapp_collection,
     }));
 
-    // setup new lapp view
+    // setup the form to create new lapp
     BBL.main_view.setView("#new-lapp-view", new Views.NewLappView({
         collection: BBL.lapp_collection,
+    }));
+    
+    //XXX
+    BBL.main_view.setView("#led_pixels", new LampSimu.LedPixelsView({
+        collection: BBL.simu.leds,
     }));
 
     // setup status view
     BBL.main_view.setView("#lapp-status-view", new Views.LappStatusView({
         model: BBL.status_model,
     }));
-
+    // setup notification on logs and outputs
+    BBL.status_model.logs.on("add", function(model, collection){
+        toastr.warning(
+            model.get("msg"),
+            "",
+            {
+                "onclick": function(){alert("io")}
+            }
+        );
+    });
+    BBL.status_model.outputs.on("add", function(model, collection){
+        toastr.info(
+            model.get("msg"),
+            "",
+            {
+                "onclick": function(){alert("io")}
+            }
+        );
+    });
+    
+    // mesage before to quit the page
+//    window.onbeforeunload = function() {
+//      return "";
+//    }
+    
     BBL.main_view.render();
 
     // download data and setup router
@@ -124,6 +164,35 @@ BBL.init = function() {
 };
 
 $(function() {
-    BBL.init();
+    // config for notification
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "positionClass": "toast-top-right",
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "10000",
+      "extendedTimeOut": "2000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    
+    // i18n init
+    var i18n_options = {
+        detectLngQS: 'lang',
+        fallbackLng: 'en',
+        resGetPath: 'static/locales/__ns__-__lng__.json',
+        debug: true,
+    };
+    
+    i18n.init(i18n_options, function(t){
+        // translate the loading mesage
+        $("#app").i18n();
+        
+        // start the app itself
+        BBL.init(t);
+    });
 });
 
