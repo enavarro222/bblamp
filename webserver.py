@@ -103,17 +103,18 @@ def monitor_logging_file(filename, output_fct):
                         break # try to reopen it if it has been deleted
                     # try to read next line
                     log_line = in_file.readline()
-                    # wait short time to be sure to not miss next "same log line"
-                    gevent.sleep(0.001)
-                    last_pos = in_file.tell()
-                    nextline = in_file.readline()
-                    while not (nextline == "" or nextline.startswith("LampApp")): # = not a new log line
-                        log_line += nextline
-                        # wait short time to be sure to not miss next "same log line"
-                        gevent.sleep(0.001)
+                    if log_line != "":
+                        # Search if next lines are for the same log "line"
+                        ## wait short time to be sure to not miss next "same log line"
+                        gevent.sleep(2e-3)
                         last_pos = in_file.tell()
                         nextline = in_file.readline()
-                    if log_line != "":
+                        while not (nextline == "" or nextline.startswith("LampApp")): # = not a new log line
+                            log_line += nextline
+                            # wait short time to be sure to not miss next "same log line"
+                            gevent.sleep(2e-3)
+                            last_pos = in_file.tell()
+                            nextline = in_file.readline()
                         # push log_line
                         output_fct(log_line)
                         # and seek back to the next log line (seek to the same position)
