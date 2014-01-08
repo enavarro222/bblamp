@@ -523,7 +523,7 @@ Views.LappStatusView = i18nLayout.extend({
         var data = this.model.attributes;
         //var now = new Date(this.model.get("date"));
         var now = new Date();
-        if(this.model.get("status") == "running"){
+        if(this.model.isRunning()){
             data.start_from = moment(this.model.get("start_time")).fromNow();
         }
         return data;
@@ -532,7 +532,9 @@ Views.LappStatusView = i18nLayout.extend({
     _afterRender: function(){
         // re-render in 30 sec to update start_from timing
         var self = this;
-        setTimeout(function(){self.render();}, 30*1000);
+        if(this.model.isRunning()){
+            setTimeout(function(){self.render();}, 30*1000);
+        }
     },
     
     stop: function(){

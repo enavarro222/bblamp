@@ -26,18 +26,36 @@ class LampApp(object):
         self.lamp = LedPixels(self.NBPIXEL)
         self.lamp.turn_off()
         
+        self._setup_fct = None
         self._to_spawn = []
 
+    def _run_log(self, fn):
+        """ Run a fct and log exception (if any)
+        """
+        error = None
+        try:
+            fn()
+        except Exception as err:
+            self.log.exception("uncaught exception:")
+            error = err
+        return error
+
+    def setup(self):
+        """ Function decorator to declare an function to run every indicaded
+        """
+        def setup_deco(fn):
+            self._setup_fct = fn
+            return fn
+        return setup_deco
+    
     def every(self, time):
         """ Function decorator to declare an function to run every indicaded
         """
         def every_deco(fn):
             def run_every():
                 while True:
-                    try:
-                        fn()
-                    except Exception as err:
-                        self.log.exception("uncaught exception:")
+                    error = self._run_log(fn)
+                    if error:
                         break
                     gevent.sleep(time)
             self._to_spawn.append(run_every)
@@ -117,8 +135,10 @@ class LampApp(object):
             ## out file for self.msg
             self._stdout_filemane = args.outfile
             ## run the lapp itself
-            jobs = [gevent.spawn(fn) for fn in self._to_spawn]
-            gevent.joinall(jobs)
+            setup_error = self._run_log(self._setup_fct)
+            if not setup_error:
+                jobs = [gevent.spawn(fn) for fn in self._to_spawn]
+                gevent.joinall(jobs)
         except Exception:
             self.log.exception("uncaught exception:")
             raise

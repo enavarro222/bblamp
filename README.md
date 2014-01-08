@@ -111,21 +111,18 @@ Lamp App web editor/manager
 TODO
 ----
 
-- [ ] UI: blockly: add "setup" block **H**
 - [ ] UI: blockly: add "lapp_every_ms"
 - [ ] UI: blockly: add "pause of TIME milliseconds"
 - [ ] UI: blockly: make "block bags"
-- [ ] UI: blockly: add color builer from HSV
+- [ ] UI: blockly: add color builder from HSV
+- [ ] UI: blockly: i18n automatic load good i18n js file
+- [ ] UI: blockly: i18n custom blocks **H**
 - [ ] UI: prevent quit without save  **H**
-- [ ] UI: log & output: manage the history, list, clear
 - [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice  **H**
 - [ ] UI: run/stop/etc... check ajax call error
 - [ ] UI: remove an app (with confirmation)
 - [ ] UI: discard changes (with confirmation)
-- [ ] UI: manage lapp metadata (author, comment)
 - [ ] UI: (BUG) event may deconect
-- [ ] UI: blockly: i18n automatic load good i18n js file
-- [ ] UI: blockly: i18n custom blocks **H**
 - [ ] UI: remaster the layout : editor full width, except when simulator on right
 - [ ] UI: front page: list of apps in full width
 - [ ] UI: unified run/status menu View (with both model = status, collection = lapp_collection)
@@ -144,7 +141,9 @@ TODO
 
 
 Long or middle term:
+- [ ] UI: manage lapp metadata (author, comment)
 - [ ] server: get lapp SyntaxError back to UI
+- [ ] UI: log & output: manage the history, list, clear
 - [ ] UI: use require.js
 - [ ] UI: editor ace: autocompletion
 - [ ] server: manage (simply) concurrent edition
@@ -153,6 +152,7 @@ Long or middle term:
 - [ ] install a demo version on a public server (with pswd)
 
 
+- [x] UI: blockly: add "setup" block
 - [x] UI: blockly: fork => svn export & git add
 - [x] UI: update run time in status view
 - [x] UI: BUG fix VagueTime 1h hour diff !

@@ -43,7 +43,7 @@ Blockly.Python['procedures_defreturn'] = function(block) {
       globals.splice(i, 1);
     }
   }
-  globals = globals.length ? '  global ' + globals.join(', ') + '\n' : '';
+  globals = globals.length ? '    global ' + globals.join(', ') + '\n' : '';
   var funcName = Blockly.Python.variableDB_.getName(block.getFieldValue('NAME'),
       Blockly.Procedures.NAME_TYPE);
   var branch = Blockly.Python.statementToCode(block, 'STACK');
@@ -54,9 +54,9 @@ Blockly.Python['procedures_defreturn'] = function(block) {
   var returnValue = Blockly.Python.valueToCode(block, 'RETURN',
       Blockly.Python.ORDER_NONE) || '';
   if (returnValue) {
-    returnValue = '  return ' + returnValue + '\n';
+    returnValue = '    return ' + returnValue + '\n';
   } else if (!branch) {
-    branch = '  pass';
+    branch = '    pass';
   }
   var args = [];
   for (var x = 0; x < block.arguments_.length; x++) {
@@ -109,9 +109,9 @@ Blockly.Python['procedures_ifreturn'] = function(block) {
   if (block.hasReturnValue_) {
     var value = Blockly.Python.valueToCode(block, 'VALUE',
         Blockly.Python.ORDER_NONE) || 'None';
-    code += '  return ' + value + '\n';
+    code += '    return ' + value + '\n';
   } else {
-    code += '  return\n';
+    code += '    return\n';
   }
   return code;
 };

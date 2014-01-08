@@ -178,5 +178,9 @@ var LappStatusModel = Backbone.Model.extend({
         //TODO: check the return value
         $.ajax("/v1/ctrl/stop");
     },
+    
+    isRunning: function(){
+        return this.get("status") == "running";
+    },
 });
 

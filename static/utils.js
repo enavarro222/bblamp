@@ -27,9 +27,7 @@ var i18nLayout = Backbone.Layout.extend({
             this._afterRender();
         }
     },
-
 });
-
 
 /* Colors */
 function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
