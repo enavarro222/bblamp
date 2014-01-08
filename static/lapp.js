@@ -186,8 +186,10 @@ $(function() {
         resGetPath: 'static/locales/__ns__-__lng__.json',
         debug: true,
     };
-    
     i18n.init(i18n_options, function(t){
+        // setup moment (date) language
+        moment.lang(i18n.lng().split("-")[0]);
+        
         // translate the loading mesage
         $("#app").i18n();
         

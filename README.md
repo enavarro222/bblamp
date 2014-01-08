@@ -111,7 +111,6 @@ Lamp App web editor/manager
 TODO
 ----
 
-- [ ] UI: blockly: fork => svn export & git add **H**
 - [ ] UI: blockly: add "setup" block **H**
 - [ ] UI: blockly: add "lapp_every_ms"
 - [ ] UI: blockly: add "pause of TIME milliseconds"
@@ -125,8 +124,8 @@ TODO
 - [ ] UI: discard changes (with confirmation)
 - [ ] UI: manage lapp metadata (author, comment)
 - [ ] UI: (BUG) event may deconect
-- [ ] UI: blockly: i18n set language from i18next
-- [ ] UI: blockly: i18n custom blocks
+- [ ] UI: blockly: i18n automatic load good i18n js file
+- [ ] UI: blockly: i18n custom blocks **H**
 - [ ] UI: remaster the layout : editor full width, except when simulator on right
 - [ ] UI: front page: list of apps in full width
 - [ ] UI: unified run/status menu View (with both model = status, collection = lapp_collection)
@@ -134,7 +133,6 @@ TODO
 - [ ] server: integration with nginx (http://salem.harrache.info/application-wsgi-avec-gevent-et-nginx.html)
 - [ ] server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
 - [ ] server: clean start/stop/status responses (API)
-- [ ] server/lapp: 
 - [ ] lapp: lamp start led id at 1 not at 0
 - [ ] lapp: add a push button (simu first)
 - [ ] lapp: add push button (GPIO)
@@ -154,6 +152,10 @@ Long or middle term:
 - [ ] lapp/server: manage hardware (what present, what needed)
 - [ ] install a demo version on a public server (with pswd)
 
+
+- [x] UI: blockly: fork => svn export & git add
+- [x] UI: update run time in status view
+- [x] UI: BUG fix VagueTime 1h hour diff !
 - [x] lapp: move to event based ! (every k sec, on button pressed, etc...)
 - [x] lapp: reset led on exit
 - [x] UI: i18n avec i18next

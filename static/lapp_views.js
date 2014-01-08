@@ -524,18 +524,19 @@ Views.LappStatusView = i18nLayout.extend({
         //var now = new Date(this.model.get("date"));
         var now = new Date();
         if(this.model.get("status") == "running"){
-            data.start_from = vagueTime.get({
-                "to": now,
-                "from": new Date(this.model.get("start_time")),
-                "lang": i18n.lng().split("-")[0]
-            });
+            data.start_from = moment(this.model.get("start_time")).fromNow();
         }
         return data;
     },
+
+    _afterRender: function(){
+        // re-render in 30 sec to update start_from timing
+        var self = this;
+        setTimeout(function(){self.render();}, 30*1000);
+    },
     
     stop: function(){
-        //XXX: move to model
-        $.ajax("/v1/ctrl/stop");
+        this.model.stop();
     },
 });
 

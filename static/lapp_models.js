@@ -171,6 +171,12 @@ var LappStatusModel = Backbone.Model.extend({
         response["log"] = [];
         response["output"] = []
         return response;
-    }
+    },
+    
+    stop: function(){
+        // stop the running app
+        //TODO: check the return value
+        $.ajax("/v1/ctrl/stop");
+    },
 });
 
