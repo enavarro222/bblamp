@@ -4,7 +4,9 @@ static/ace
 bootstrap/
 static/bootstrap
 lapp_output/
-lapp/*
+blockly/msg/js/*.js
+blockly/*_compressed.js
+closure-library-read-only/
 
 # std
 *.py[cod]

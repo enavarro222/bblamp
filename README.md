@@ -116,7 +116,8 @@ TODO
 - [ ] UI: blockly: make "block bags"
 - [ ] UI: blockly: add color builder from HSV
 - [ ] UI: blockly: i18n automatic load good i18n js file
-- [ ] UI: blockly: i18n custom blocks **H**
+- [ ] UI: blockly: variables blocs and trunon/turnoff have same color
+- [x] UI: blockly: add a "wait" bloc
 - [ ] UI: prevent quit without save  **H**
 - [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice  **H**
 - [ ] UI: run/stop/etc... check ajax call error
@@ -130,7 +131,7 @@ TODO
 - [ ] server: integration with nginx (http://salem.harrache.info/application-wsgi-avec-gevent-et-nginx.html)
 - [ ] server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
 - [ ] server: clean start/stop/status responses (API)
-- [ ] lapp: lamp start led id at 1 not at 0
+- [x] lapp: lamp start led id at 1 not at 0
 - [ ] lapp: add a push button (simu first)
 - [ ] lapp: add push button (GPIO)
 - [ ] lapp: fix issue with GPIO not as root
@@ -152,6 +153,7 @@ Long or middle term:
 - [ ] install a demo version on a public server (with pswd)
 
 
+- [x] UI: blockly: i18n custom blocks
 - [x] UI: blockly: add "setup" block
 - [x] UI: blockly: fork => svn export & git add
 - [x] UI: update run time in status view

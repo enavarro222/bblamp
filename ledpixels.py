@@ -111,26 +111,26 @@ class LedPixelsAbstract():
         raise NotImplementedError()
 
     def set_color(self, lnum, color):
-        assert 0 <= lnum < self._nb_pixel
-        self.colors[lnum] = color
+        assert 1 <= lnum <= self._nb_pixel
+        self.colors[lnum-1] = color
 
     def set_color_all(self, color):
-        for lnum in xrange(self._nb_pixel):
+        for lnum in xrange(1, self._nb_pixel+1):
             self.set_color(lnum, color)
 
     def on(self, lnum=None):
         if lnum is None:
             self.is_on = [True] * self._nb_pixel
         else:
-            assert 0 <= lnum < self._nb_pixel
-            self.is_on[lnum] = True
+            assert 1 <= lnum <= self._nb_pixel
+            self.is_on[lnum-1] = True
 
     def off(self, lnum=None):
         if lnum is None:
             self.is_on = [False] * self._nb_pixel
         else:
-            assert 0 <= lnum < self._nb_pixel
-            self.is_on[lnum] = False
+            assert 1 <= lnum <= self._nb_pixel
+            self.is_on[lnum-1] = False
 
     def turn_on(self, lnum=None, color=None):
         if color is not None:

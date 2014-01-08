@@ -288,6 +288,7 @@
     "VARIABLES_SET_TOOLTIP": "Fixe cette variable pour qu’elle soit égale à la valeur de l’entrée.",
     "VARIABLES_SET_CREATE_GET": "Créer 'obtenir %1'",
     "PROCEDURES_DEFNORETURN_TITLE": "à",
+    "PROCEDURES_DEFNORETURN_DO": "faire",
     "PROCEDURES_DEFNORETURN_PROCEDURE": "faire quelque chose",
     "PROCEDURES_BEFORE_PARAMS": "avec :",
     "PROCEDURES_DEFNORETURN_TOOLTIP": "Crée une fonction sans sortie.",
@@ -303,5 +304,14 @@
     "PROCEDURES_HIGHLIGHT_DEF": "Surligner la définition de la fonction",
     "PROCEDURES_CREATE_DO": "Créer '%1'",
     "PROCEDURES_IFRETURN_TOOLTIP": "Si une valeur est vraie, alors renvoyer une seconde valeur.",
-    "PROCEDURES_IFRETURN_WARNING": "Attention : Ce bloc pourrait n’être utilisé que dans une définition de fonction."
+    "PROCEDURES_IFRETURN_WARNING": "Attention : Ce bloc pourrait n’être utilisé que dans une définition de fonction.",
+    "BBLAMP_SETUP_TITLE": "à l'initialisation",
+    "BBLAMP_EVERY_TITLE": "chaque",
+    "BBLAMP_EVERY_SECONDS": "secondes",
+    "BBLAMP_TURNON_TITLE": "allumer la led",
+    "BBLAMP_TURNON_TOCOLOR": "en couleur",
+    "BBLAMP_TURNOFF_TITLE": "éteindre la led",
+    "BBLAMP_WAIT_TITLE": "attendre",
+    "BBLAMP_WAIT_SECONDS": "secondes",
+    "BBLAMP_WAIT_MILLISECONDS": "millisecondes"
 }

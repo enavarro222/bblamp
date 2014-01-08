@@ -351,5 +351,14 @@
     "PROCEDURES_HIGHLIGHT_DEF": "Highlight function definition",
     "PROCEDURES_CREATE_DO": "Create '%1'",
     "PROCEDURES_IFRETURN_TOOLTIP": "If a value is true, then return a second value.",
-    "PROCEDURES_IFRETURN_WARNING": "Warning: This block may be used only within a function definition."
+    "PROCEDURES_IFRETURN_WARNING": "Warning: This block may be used only within a function definition.",
+    "BBLAMP_SETUP_TITLE": "at setup",
+    "BBLAMP_EVERY_TITLE": "every",
+    "BBLAMP_EVERY_SECONDS": "seconds",
+    "BBLAMP_TURNON_TITLE": "turn on led",
+    "BBLAMP_TURNON_TOCOLOR": "to colour",
+    "BBLAMP_TURNOFF_TITLE": "turn off led",
+    "BBLAMP_WAIT_TITLE": "wait",
+    "BBLAMP_WAIT_SECONDS": "seconds",
+    "BBLAMP_WAIT_MILLISECONDS": "milliseconds"
 }

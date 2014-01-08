@@ -4,6 +4,7 @@ import sys
 import logging
 import argparse
 import signal
+import time
 
 import gevent
 
@@ -41,30 +42,34 @@ class LampApp(object):
         return error
 
     def setup(self):
-        """ Function decorator to declare an function to run every indicaded
+        """ Function decorator to declare an function to be run at start up
         """
         def setup_deco(fn):
             self._setup_fct = fn
             return fn
         return setup_deco
     
-    def every(self, time):
-        """ Function decorator to declare an function to run every indicaded
+    def every(self, wait_time):
+        """ Function decorator to declare an function to be run every indicaded
         """
         def every_deco(fn):
             def run_every():
                 while True:
+                    stime = time.time()
                     error = self._run_log(fn)
                     if error:
                         break
-                    gevent.sleep(time)
+                    exec_time = time.time() - stime
+                    # wait at least 20ms
+                    self.wait(max(20e-3, wait_time-exec_time))
             self._to_spawn.append(run_every)
             return run_every
         return every_deco
     
     def on(self, obj, event):
+        """ Function decorator to declare an function to be run on an event
         """
-        """
+        #TODO
         def on_deco(fn):
             return fn
         return on_deco
@@ -80,6 +85,9 @@ class LampApp(object):
         if self.lamp:
             self.lamp.turn_off()
         sys.exit()
+
+    def wait(self, time):
+        gevent.sleep(time)
 
     def run(self):
         """ Run the lapp, ie:
