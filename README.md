@@ -150,12 +150,12 @@ Long or middle term:
 - [ ] UI: manage lapp metadata (author, comment)
 - [ ] UI: log & output: manage the history, list, clear
 - [ ] UI: use require.js
-- [ ] UI: editor ace: autocompletion
 - [ ] server: store lapp in a local git repo (so store history)
 - [ ] lapp/server: manage hardware (what present, what needed)
 - [ ] install a demo version on a public server (with pswd)
 
 
+- [x] UI: editor ace: autocompletion
 - [x] lapp: move to event based ! (every k sec, on button pressed, etc...)
 - [x] lapp: reset led on exit
 - [x] lapp: lamp start led id at 1 not at 0

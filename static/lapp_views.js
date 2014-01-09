@@ -139,10 +139,14 @@ Views.LappAceEditorView = Backbone.Layout.extend({
     afterRender: function(){
         this.log("create the ACE editor");
         // create the python editor
+        ace.require("ace/ext/language_tools");
         this.editor = ace.edit(this.$('#the_ace_editor')[0]);
         this.editor.setTheme('ace/theme/monokai');
         this.editor.getSession().setMode('ace/mode/python');
         this.editor.getSession().setUseWrapMode(true);
+        this.editor.setOptions({
+            enableBasicAutocompletion: true
+        });
         // set value
         this.editor.setValue(this.model.get('py_code'));
         this.updateEditable();
@@ -365,8 +369,13 @@ Views.LappMenuView = i18nLayout.extend({
     },
     
     initialize: function() {
+        var self = this;
         _(this).bindAll('save', 'run', 'close');
         this.listenTo(this.model, 'change:state', this.render);
+        this.listenTo(bbMousetrap(), 'ctrl+s', function(){
+            self.save();
+            return false;
+        });
     },
 
     log: function(msg) {

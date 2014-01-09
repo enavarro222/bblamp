@@ -19,6 +19,26 @@ function asEvents(el) {
     };
 }
 
+/**
+ * Use Backbone Events listenTo/stopListening with Mousetrap
+ *
+ * @return {Backbone Events style object}
+ **/
+function bbMousetrap() {
+    var args;
+    return {
+        on: function(keys, handler) {
+            if (args) throw new Error("this is one off wrapper");
+            Mousetrap.bind(keys, handler);
+            args = keys;
+        },
+        off: function() {
+            Mousetrap.unbind(args);
+        }
+
+    };
+}
+
 /* i18n view */
 var i18nLayout = Backbone.Layout.extend({
     afterRender: function() {
