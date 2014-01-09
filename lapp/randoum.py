@@ -4,47 +4,46 @@ from random import randint, gauss
 from colorsys import hls_to_rgb
 
 from lapp import LampApp
+from ledpixels import Color
+
+app = LampApp()
 
 def randColor(light, sat, mu=0.3, sigma=0.06):
     hue = gauss(mu, sigma)
     c = [hue%1,  light, sat]
     c = [int(255*val) for val in hls_to_rgb(*c)]
-    return  c
+    return  Color(*c)
 
-class MyLampApp(LampApp):
+@app.setup()
+def setup():
+    global on, count, saturation, light, colors
+    on = False
+    count = 0
 
-    def setup(self):
-        self.on = False
-        self.count = 0
+    #colorsys.hls_to_rgb(h, l, s)
+    saturation = 0.7
+    light = 0.4
+    
+    colors = [ randColor(light, saturation, mu=0) for _ in range(0, 25) ]
 
-        #colorsys.hls_to_rgb(h, l, s)
-        self.saturation = 0.7
-        self.light = 0.4
-        
-        self.colors = [
-            randColor(self.light, self.saturation, mu=0)
-            for _ in range(0, 25)
-        ]
-        
-    def loop(self):
+    
+@app.every(0.05)
+def loop():
+    global on, count, saturation, light, colors
 
-        self.count += 1
-        self.lamp.all_on()
-        
-        mu = (self.count/900.)%1
-        # change one color:
-        for _ in range(randint(0, 2)):
-            k = randint(0, 24)
-            self.colors[k] = randColor(self.light, self.saturation, mu=mu)
-        
-        for k in range(0, 25):
-            color = self.colors[k]
-            self.lamp.set_color(k, *color)
-            #self.lamp.switch_on(self.position[k])
+    count += 1
+    app.lamp.turn_on(flush=False)
+    
+    mu = (count / 900.) % 1
+    # change one color:
+    for _ in range(randint(0, 2)):
+        k = randint(0, 24)
+        colors[k] = randColor(light, saturation, mu=mu)
+    
+    for k in range(0, 25):
+        app.lamp.turn_on(k+1, colors[k], flush=False)
 
-        self.lamp.flush()
-        time.sleep(0.05)
+    app.lamp.flush()
 
 if __name__ == "__main__":
-    lapp = MyLampApp()
-    lapp.run()
+    app.run()

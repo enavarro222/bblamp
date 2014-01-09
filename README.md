@@ -117,7 +117,6 @@ TODO
 - [ ] UI: blockly: add color builder from HSV
 - [ ] UI: blockly: i18n automatic load good i18n js file
 - [ ] UI: blockly: variables blocs and trunon/turnoff have same color
-- [x] UI: blockly: add a "wait" bloc
 - [ ] UI: prevent quit without save  **H**
 - [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice  **H**
 - [ ] UI: run/stop/etc... check ajax call error
@@ -131,8 +130,10 @@ TODO
 - [ ] server: integration with nginx (http://salem.harrache.info/application-wsgi-avec-gevent-et-nginx.html)
 - [ ] server: use Flask-Classy ClassView to simplify the API blueprint http://pythonhosted.org/Flask-Classy/
 - [ ] server: clean start/stop/status responses (API)
-- [x] lapp: lamp start led id at 1 not at 0
-- [ ] lapp: add a push button (simu first)
+- [ ] server: (BUG) monitoring of msg is not the same than log...
+- [ ] server: lapp list alpha order by default
+- [ ] lapp: better error message when invalid "lnum"
+- [ ] lapp: add a push button (simu first) **H**
 - [ ] lapp: add push button (GPIO)
 - [ ] lapp: fix issue with GPIO not as root
 - [ ] lapp: GPIO how to do with interupt ?
@@ -142,24 +143,28 @@ TODO
 
 
 Long or middle term:
-- [ ] UI: manage lapp metadata (author, comment)
+- [ ] server: add the number of connected client in status
+- [ ] server: add the **names** of connected client in status
+- [ ] server: manage (simply) concurrent edition
 - [ ] server: get lapp SyntaxError back to UI
+- [ ] UI: manage lapp metadata (author, comment)
 - [ ] UI: log & output: manage the history, list, clear
 - [ ] UI: use require.js
 - [ ] UI: editor ace: autocompletion
-- [ ] server: manage (simply) concurrent edition
 - [ ] server: store lapp in a local git repo (so store history)
 - [ ] lapp/server: manage hardware (what present, what needed)
 - [ ] install a demo version on a public server (with pswd)
 
 
+- [x] lapp: move to event based ! (every k sec, on button pressed, etc...)
+- [x] lapp: reset led on exit
+- [x] lapp: lamp start led id at 1 not at 0
+- [x] UI: blockly: add a "wait" bloc
 - [x] UI: blockly: i18n custom blocks
 - [x] UI: blockly: add "setup" block
 - [x] UI: blockly: fork => svn export & git add
 - [x] UI: update run time in status view
 - [x] UI: BUG fix VagueTime 1h hour diff !
-- [x] lapp: move to event based ! (every k sec, on button pressed, etc...)
-- [x] lapp: reset led on exit
 - [x] UI: i18n avec i18next
 - [x] UI: lapp started time "since" : https://github.com/philbooth/vagueTime.js
 - [x] UI: change editor style when readonly
@@ -188,6 +193,7 @@ Long or middle term:
 - [x] UI: close a lapp
 - [x] UI: make a LappView use sub views (and manage leaks)
 - [x] UI: test backbone layout manager plugin
+- [x] server: (BUG) on read log file
 - [x] server: manage save
 - [x] server: manage .info file
 - [x] server: isolate lapp management API in a blueprint, with separete url with version

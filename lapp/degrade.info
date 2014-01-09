@@ -1,5 +1,5 @@
 [lapp]
 author = 
 comment = 
-from_blockly = False
+from_blockly = True
 

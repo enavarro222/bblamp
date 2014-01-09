@@ -18,15 +18,16 @@ class LampApp(object):
 
     def __init__(self):
         #logging
+        self.debug = False  # if true exception aren't catched
         self.log = logging.getLogger("LampApp")
         # stdout (for self.print)
         self._stdout_filemane = None
         ## "hardware" driver init
-        #TODO make it configurable from "run"
+        #TODO make hardwaire configurable
         # init leds
         self.lamp = LedPixels(self.NBPIXEL)
-        self.lamp.turn_off()
-        
+        self.lamp.off()
+        ## events callbacks
         self._setup_fct = None
         self._to_spawn = []
 
@@ -38,6 +39,8 @@ class LampApp(object):
             fn()
         except Exception as err:
             self.log.exception("uncaught exception:")
+            if self.debug:
+                raise
             error = err
         return error
 
@@ -63,7 +66,7 @@ class LampApp(object):
                     # wait at least 20ms
                     self.wait(max(20e-3, wait_time-exec_time))
             self._to_spawn.append(run_every)
-            return run_every
+            return fn
         return every_deco
     
     def on(self, obj, event):
@@ -143,7 +146,9 @@ class LampApp(object):
             ## out file for self.msg
             self._stdout_filemane = args.outfile
             ## run the lapp itself
-            setup_error = self._run_log(self._setup_fct)
+            setup_error = None
+            if self._setup_fct:
+                setup_error = self._run_log(self._setup_fct)
             if not setup_error:
                 jobs = [gevent.spawn(fn) for fn in self._to_spawn]
                 gevent.joinall(jobs)

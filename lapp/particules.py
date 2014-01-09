@@ -1,51 +1,46 @@
 #-*- coding:utf-8 -*-
-import time
-
 from lapp import LampApp
+from ledpixels import Color
 
-class MyLampApp(LampApp):
+app = LampApp()
 
-    def setup(self):
-        self.on = False
-        self.count = 0
-        self.position = [6, 5, 7, 8, 4, 5, 10]
-        self.sens = [1, 1, 1, -1, 1, 1, -1]
-        self.period = [15, 15, 20, 40, 80, 20, 92]
-        
-        self.colors = [
-            [202,  12, 105],
-            [25,  2, 12],
-            [12,  248, 15],
-            [12,  12, 200],
-            [140,  155, 15],
-            [230,  12, 15],
-            [12,  127, 100],
-        ]
-        
-        self.nextMove = self.period
+@app.setup()
+def setup():
+    global on, count, position, sens, period, colors
     
-    def loop(self):
-        # msg every 10 blink
-        
-        self.count += 1
-        self.lamp.all_off()
-        
-        for k in range( len( self.position ) ):
-            self.lamp.set_color(self.position[k], *self.colors[k])
-            self.lamp.switch_on(self.position[k])
-            
-            # mouv:
-            if self.count % self.period[k] == 0:
-                
-                if self.position[k] <= 0 or self.position[k] >= 24:
-                    self.sens[k] = -self.sens[k]
-                    
-                self.position[k] = self.position[k] + self.sens[k]    
-                
+    on = False
+    count = 0
+    position = [1, 20, 6, 15]
+    sens = [1, -1, 1, -1]
+    period = [14, 6, 25, 60]
+    
+    colors = [
+        Color(202,  12, 105),
+        Color(250,  200, 12),
+        Color(12,  248, 15),
+        Color(12,  127, 100),
+    ]
+    
+@app.every(0.01)
+def loop():
+    global on, count, position, sens, period, colors
+    # msg every 10 blink
+    
+    count += 1
+    app.lamp.off()
 
-        self.lamp.flush()
-        time.sleep(0.01)
+    for k in range( len( position ) ):
+        app.lamp.turn_on(position[k], colors[k], flush=False)
+
+        # mouv:
+        if count % period[k] == 0:
+            if position[k] == 1:
+                sens[k] = 1
+            elif position[k] == 24:
+                sens[k] = -1
+            position[k] += sens[k]    
+
+    app.lamp.flush()    
 
 if __name__ == "__main__":
-    lapp = MyLampApp()
-    lapp.run()
+    app.run()

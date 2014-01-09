@@ -132,18 +132,20 @@ class LedPixelsAbstract():
             assert 1 <= lnum <= self._nb_pixel
             self.is_on[lnum-1] = False
 
-    def turn_on(self, lnum=None, color=None):
+    def turn_on(self, lnum=None, color=None, flush=True):
         if color is not None:
             if lnum is None:
                 self.set_color_all(color)
             else:
                 self.set_color(lnum, color)
         self.on(lnum)
-        self.flush()
+        if flush:
+            self.flush()
 
-    def turn_off(self, lnum=None):
+    def turn_off(self, lnum=None, flush=True):
         self.off(lnum)
-        self.flush()
+        if flush:
+            self.flush()
 
 class LedPixels(LedPixelsAbstract):
     """ The WS2801 led string on rPy
