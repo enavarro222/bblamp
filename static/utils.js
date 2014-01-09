@@ -24,12 +24,16 @@ function asEvents(el) {
  *
  * @return {Backbone Events style object}
  **/
-function bbMousetrap() {
+function bbMousetrap(global) {
     var args;
     return {
         on: function(keys, handler) {
             if (args) throw new Error("this is one off wrapper");
-            Mousetrap.bind(keys, handler);
+            if(global){
+                Mousetrap.bindGlobal(keys, handler);
+            } else {
+                Mousetrap.bind(keys, handler);
+            }
             args = keys;
         },
         off: function() {

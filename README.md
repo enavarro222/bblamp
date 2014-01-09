@@ -118,7 +118,6 @@ TODO
 - [ ] UI: blockly: i18n automatic load good i18n js file
 - [ ] UI: blockly: variables blocs and trunon/turnoff have same color
 - [ ] UI: prevent quit without save  **H**
-- [ ] UI: add ctrl-s shortcut (save) http://craig.is/killing/mice  **H**
 - [ ] UI: run/stop/etc... check ajax call error
 - [ ] UI: remove an app (with confirmation)
 - [ ] UI: discard changes (with confirmation)
@@ -155,6 +154,7 @@ Long or middle term:
 - [ ] install a demo version on a public server (with pswd)
 
 
+- [x] UI: add ctrl-* shortcuts http://craig.is/killing/mice
 - [x] UI: editor ace: autocompletion
 - [x] lapp: move to event based ! (every k sec, on button pressed, etc...)
 - [x] lapp: reset led on exit

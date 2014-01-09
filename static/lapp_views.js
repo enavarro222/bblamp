@@ -372,8 +372,16 @@ Views.LappMenuView = i18nLayout.extend({
         var self = this;
         _(this).bindAll('save', 'run', 'close');
         this.listenTo(this.model, 'change:state', this.render);
-        this.listenTo(bbMousetrap(), 'ctrl+s', function(){
+        this.listenTo(bbMousetrap(true), 'ctrl+s', function(){
             self.save();
+            return false;
+        });
+        this.listenTo(bbMousetrap(true), 'ctrl+u', function(){
+            self.run();
+            return false;
+        });
+        this.listenTo(bbMousetrap(true), 'ctrl+q', function(){
+            self.close();
             return false;
         });
     },
@@ -388,9 +396,7 @@ Views.LappMenuView = i18nLayout.extend({
     },
 
     save: function() {
-        this.log("may save !");
         if(this.model.isModified()){
-            this.log("save !");
             this.model.save();
         }
     },
@@ -521,6 +527,11 @@ Views.LappStatusView = i18nLayout.extend({
     initialize: function() {
         _(this).bindAll("stop");
         this.listenTo(this.model, 'change', this.render);
+        var self = this;
+        this.listenTo(bbMousetrap(true), 'ctrl+i', function(){
+            self.stop();
+            return false;
+        });
     },
 
     log: function(msg) {
