@@ -1,68 +1,99 @@
 bblamp
 ======
 
-The idea is to build a lamp that is easily programmable throw a web interface using [blockly](https://code.google.com/p/blockly/) in order to teach programming to childs and people who are a priori not interested in that.
+BBLamp is a lamp that is easily programmable with the visual and drag and drop language [Blockly](https://code.google.com/p/blockly/).
+This project aims at teach programming to childs and people who are a priori not interested in that. Blockly makes programming easy and intuitive, and the lamp (with leds and sensors) make it attractive !
 
-You need a rPy in a nice box connected to a strip of RGB leds, a bunch of sensors and buttons.
-Connect it to your local network, and install BBLamp on the rPy.
-Then you can navigate to the rPy ip address and start programing it !
+The BBLamp it self is a [Raspberry Pi](http://www.raspberrypi.org/) with a strip of RGB leds, a bunch of sensors and buttons.
+It is connected to your local network and is programmable throw a modern and intuitive web interface.
 
-Blockly makes programming easy and intuitive, and the lamp (with led and sensors) make it attractive !
-
-**Warning : This project  is not yet usable !**
+**Warning : This project is not yet fully usable !**  
 This project is very young but in (active) development. Feel free to contact me for any question, comments, typo correction or whatever...
 
 
-Require
-------
+Installation
+-----------
 
-python:
+#### TODO :
+* install it on a std linux computer without any special hardware
+* install it on a rPi with led strip and sensors...
+
+Require (Software)
+----------------
+
+#### python:
 * flask
 * gevent >= 1.0 (https://pypi.python.org/pypi/gevent)
 * requests
 * sseclient (https://pypi.python.org/pypi/sseclient)
 
-javascript:
+#### javascript:
 * jquery
 * underscore.js
+* i18next.js (internationalization)
 * backbone.js
+* backbone-layoutmanager
 * twitter bootstrap
-* bootboxjs
+* bootboxjs (for confirmation/alert box)
+* toastr (for notifications)
+* moment.js (for date/time management)
+* mousetrap (for shortcuts)
 * ace.js (source code editor)
 * blockly
 
 
-Components
-----------
+Components (hardware)
+-------------------
+
+More comming soon on the prototype hardawre.
+For now it is:
 
 * Raspberry Pi
-* string of 25 12mm LedPixels WS2801 (SPI port)
-    Warning. you need led drive by WS2801 and **not** WS2811.
-    WS2801 strips have 4 wires and can easily be driven by a rPy,
-    whereas WS2811 strips have 3 wires and can **not** be driven by a rPy.
-* light sensor (I2C)
-* DHT22
+* string of 25 12mm RGB led pixels controlled by WS2801 (SPI)
+
+**Warning.** you need led drive by WS2801 and **not** WS2811. 
+WS2801 strips have 4 wires and can easily be driven by a rPi, whereas WS2811 strips have 3 wires and can **not** be driven by a rPi.  You can find it on [ebay](http://www.ebay.com/sch/i.html?_sacat=0&_from=R40&LH_BIN=1&_nkw=WS2801+led&rt=nc&LH_PrefLoc=2).
+
+We aim to add :
+
+* light sensor (i3c)
+* humidity and temp sensor (DHT22)
 * push button
 * PIR sensor
 * small mic
 * small speakers
 
-
-Files and directory
+Files and directories
 -------------------
 
-* **lapp** : for **l**amp **app**, python module that contains all user defined programs
-* todo
+The main directories are:
+
+    .
+    ├── blockly         # modified version of blockly
+    ├── lapp            # contains all user defined programs (lapp is for "lamp app")
+    ├── lapp_output     # outputs files of running user defined program
+    ├── static          # static (js/css) files
+    ├── templates       # html templates
+    └── tests           # tests files
+
+Also for now most of the python codes are (for now) loose at root directory:
+
+    api.py              # flask API to manage lapps
+    errors.py           # commmun errors
+    ledpixels.py        # leds drivers class
+    simulate.py         # flask API for html hardware similator
+    utils.py            # some useful helpers
+    webserver.py        # main program for the webserver (use flask + gevent WSGI)
 
 
-Lamp app
---------
+Lamp app or a "lapp"
+------------------
 
-* could be written using blockly
+#### some requirements:
 * autonomous python program
+* could be written using blockly
 * only one running at a time
-* may be run as a service
-* extends a class, that help
+* is run as a service
 * metadata :
  - modification date
  - creation date
@@ -70,29 +101,36 @@ Lamp app
  - comment / description
 
 
-Exemple:
+#### Exemple:
 ```python
-import time
-
+#-*- coding:utf-8 -*-
 from lapp import LampApp
 
-class MyLampApp(LampApp);
-    def setup(self):
-        pass
+app = LampApp()
 
-    def loop(self):
-        pass
-        time.sleep(0.1)
+@app.setup()
+def setup():
+    global on
+    on = False
+
+@app.every(1)
+def loop():
+    global on
+    # blink
+    if on:
+        app.lamp.turn_off()
+    else:
+        app.lamp.turn_on()
+    on = not on
 
 if __name__ == "__main__":
-    lapp = MyLampApp()
-    lapp.run()
-
+    app.run()
 ```
 
-Lamp App web editor/manager
----------------------------
+lapp web editor/manager
+---------------------
 
+#### Features:
 * create a new lapp
 * edit a lapp directly in python
 * edit a lapp with blockly
@@ -104,8 +142,10 @@ Lamp App web editor/manager
 * view last run(s) log (std+err)
 * set a lapp to be run on startup
 
+#### Also some requirements:
 * no "database": all metadata are in a .info file
 * stdout/stderr/status are redirected in files in the dir : "lapp_out"
+
 
 
 TODO
@@ -117,7 +157,7 @@ TODO
 - [ ] UI: blockly: add color builder from HSV
 - [ ] UI: blockly: i18n automatic load good i18n js file
 - [ ] UI: blockly: variables blocs and trunon/turnoff have same color
-- [ ] UI: prevent quit without save  **H**
+- [ ] **H** UI: prevent quit without save
 - [ ] UI: run/stop/etc... check ajax call error
 - [ ] UI: remove an app (with confirmation)
 - [ ] UI: discard changes (with confirmation)
@@ -132,7 +172,7 @@ TODO
 - [ ] server: (BUG) monitoring of msg is not the same than log...
 - [ ] server: lapp list alpha order by default
 - [ ] lapp: better error message when invalid "lnum"
-- [ ] lapp: add a push button (simu first) **H**
+- [ ] **H** lapp: add a push button (simu first)
 - [ ] lapp: add push button (GPIO)
 - [ ] lapp: fix issue with GPIO not as root
 - [ ] lapp: GPIO how to do with interupt ?
@@ -141,7 +181,7 @@ TODO
 - [ ] lapp: add DHT22 sensors
 
 
-Long or middle term:
+#### Long or middle term:
 - [ ] server: add the number of connected client in status
 - [ ] server: add the **names** of connected client in status
 - [ ] server: manage (simply) concurrent edition
@@ -153,7 +193,7 @@ Long or middle term:
 - [ ] lapp/server: manage hardware (what present, what needed)
 - [ ] install a demo version on a public server (with pswd)
 
-
+#### Done:
 - [x] UI: add ctrl-* shortcuts http://craig.is/killing/mice
 - [x] UI: editor ace: autocompletion
 - [x] lapp: move to event based ! (every k sec, on button pressed, etc...)
@@ -200,5 +240,4 @@ Long or middle term:
 - [x] server: manage list/new/get/update for lamp app (API)
 - [x] UI: basic HTML/JS interface (backbone)x
 - [x] UI: add python editor on interface
-
 
