@@ -376,7 +376,7 @@ Views.LappMenuView = i18nLayout.extend({
             self.save();
             return false;
         });
-        this.listenTo(bbMousetrap(true), 'ctrl+u', function(){
+        this.listenTo(bbMousetrap(true), 'ctrl+e', function(){
             self.run();
             return false;
         });
@@ -528,7 +528,7 @@ Views.LappStatusView = i18nLayout.extend({
         _(this).bindAll("stop");
         this.listenTo(this.model, 'change', this.render);
         var self = this;
-        this.listenTo(bbMousetrap(true), 'ctrl+i', function(){
+        this.listenTo(bbMousetrap(true), 'ctrl+a', function(){
             self.stop();
             return false;
         });

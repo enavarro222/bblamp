@@ -2,6 +2,10 @@ body {
     padding-top: 65px; 
 }
 
+span.shortcut_help {
+    color: #777;
+    font-size: 0.8em;
+}
 
 /* -------------------------------------------------------------------------- */
 #toast-container {

@@ -7,7 +7,6 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jslib/toastr.min.css') }}">
 
-<!--        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bblamp.css') }}">-->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bs_bblamp.css') }}">
     </head>
     <body>
@@ -69,10 +68,28 @@
                 <li class="active dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= name %> <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li <% if (state != 'modified') { %>class="disabled"<% } %> ><a href="#" class="bb_save" data-i18n="lapp.save"></a></li>
-                    <li><a href="#" class="bb_run" data-i18n="lapp.run"></a></li>
+                    <li <% if (state != 'modified') { %>class="disabled"<% } %> >
+                        <a href="#" class="bb_save">
+                            <span class="glyphicon glyphicon-floppy-open"></span>
+                            <span data-i18n="lapp.save"></span>
+                            <span class="shortcut_help">(Ctrl+s)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="bb_run">
+                            <span class="glyphicon glyphicon-play"></span>
+                            <span data-i18n="lapp.run"></span>
+                            <span class="shortcut_help">(Ctrl+e)</span>
+                        </a>
+                    </li>
                     <li class="divider"></li>
-                    <li><a href="#" class="bb_close" data-i18n="lapp.close"></a></li>
+                    <li>
+                        <a href="#" class="bb_close">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            <span data-i18n="lapp.close"></span>
+                            <span class="shortcut_help">(Ctrl+q)</span>
+                        </a>
+                    </li>
                   </ul>
                 </li>
             </ul>
@@ -95,7 +112,8 @@
             <div class="btn-group">
                 <% if (status=="running") { %>
                   <button type="button" class="bb_stop btn btn-danger">
-                    <span data-i18n="status.stop"/> '<%= script_name %>'
+                    <span data-i18n="status.stop"></span> 
+                    <span>'<%= script_name %>'</span>
                   </button>
                   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
@@ -106,7 +124,11 @@
                             '<%= script_name %>' <span data-i18n="status.started"/> <%= start_from %>
                         </li>
                         <li>
-                            <a href="#" class="bb_stop"><span data-i18n="status.stop"/> '<%= script_name %>'</a>
+                            <a href="#" class="bb_stop">
+                                <span class="glyphicon glyphicon-stop"></span>
+                                <span data-i18n="status.stop"/> '<%= script_name %>'
+                                <span class="shortcut_help">(Ctrl-a)</span>
+                            </a>
                         </li>
                   </ul>
                 <% } else { %>

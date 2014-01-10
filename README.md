@@ -151,18 +151,25 @@ lapp web editor/manager
 TODO
 ----
 
+- [ ] UI: template JS dans un fichier static ?
+- [ ] **H** UI: new lapp (popup with form to choose the name)
+- [ ] **H** UI: prevent quit without save
+- [x] UI: indicate short cut in UI
+- [ ] UI: make lang change view
+- [ ] UI: menu to switch to python/blocly
+- [ ] UI: rename (popup with form to choose the name) => create delete (if delete fail, then delate new)
 - [ ] UI: blockly: add "lapp_every_ms"
 - [ ] UI: blockly: add "pause of TIME milliseconds"
 - [ ] UI: blockly: make "block bags"
-- [ ] UI: blockly: add color builder from HSV
+- [ ] UI: blockly: add an HSV color builder
 - [ ] UI: blockly: i18n automatic load good i18n js file
 - [ ] UI: blockly: variables blocs and trunon/turnoff have same color
-- [ ] **H** UI: prevent quit without save
 - [ ] UI: run/stop/etc... check ajax call error
 - [ ] UI: remove an app (with confirmation)
 - [ ] UI: discard changes (with confirmation)
 - [ ] UI: (BUG) event may deconect
 - [ ] UI: remaster the layout : editor full width, except when simulator on right
+- [ ] UI: clean simulator model (and view)
 - [ ] UI: front page: list of apps in full width
 - [ ] UI: unified run/status menu View (with both model = status, collection = lapp_collection)
 - [ ] UI: unactivate run when already running ...
@@ -171,14 +178,17 @@ TODO
 - [ ] server: clean start/stop/status responses (API)
 - [ ] server: (BUG) monitoring of msg is not the same than log...
 - [ ] server: lapp list alpha order by default
-- [ ] lapp: better error message when invalid "lnum"
 - [ ] **H** lapp: add a push button (simu first)
+- [ ] lapp: better error message when invalid "lnum"
 - [ ] lapp: add push button (GPIO)
 - [ ] lapp: fix issue with GPIO not as root
 - [ ] lapp: GPIO how to do with interupt ?
 - [ ] lapp: add kill signal catch to lapp, log it correctly before to quit
 - [ ] lapp: add i2c sensors
 - [ ] lapp: add DHT22 sensors
+- [ ] lapp: rPy system sensor ? temperature...
+  http://raspberrypi.stackexchange.com/questions/357/how-do-i-monitor-and-or-control-the-temperature-of-the-soc
+  http://raspberrypi.stackexchange.com/questions/9105/raspberry-pi-onboard-temp-sensors-in-raspbianwheezy
 
 
 #### Long or middle term:
