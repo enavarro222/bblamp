@@ -127,6 +127,19 @@ if __name__ == "__main__":
     app.run()
 ```
 
+
+BBLamp custom blocks
+------------------
+
+Here is the description of BBLamp specific blocks.
+
+* setup: run the action when application is run, before everything else.
+* every: periodically perform an action.
+* wait: make a pause of a given time
+* on
+
+
+
 lapp web editor/manager
 ---------------------
 
