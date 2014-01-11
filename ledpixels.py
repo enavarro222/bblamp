@@ -7,10 +7,41 @@ import fcntl
 import requests
 import json
 
-
+# --- 
 class Color(object):
     """ Color object, internal representation is 3 octets for rgb
     """
+    
+    # Gamma correction compensates for our eyes' nonlinear perception of
+    # intensity.  It's the LAST step before a pixel value is stored, and
+    # allows intermediate rendering/processing to occur in linear space.
+    # The table contains 256 elements (8 bit input), though the outputs are
+    # only 7 bits (0 to 127).  This is normal and intentional by design: it
+    # allows all the rendering code to operate in the more familiar unsigned
+    # 8-bit colorspace (used in a lot of existing graphics code), and better
+    # preserves accuracy where repeated color blending operations occur.
+    # Only the final end product is converted to 7 bits, the native format
+    # for the LPD8806 LED driver.  Gamma correction and 7-bit decimation
+    # thus occur in a single operation.
+    gammaTable  = [
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,
+        2,  2,  2,  2,  2,  3,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,
+        4,  4,  4,  4,  5,  5,  5,  5,  5,  6,  6,  6,  6,  6,  7,  7,
+        7,  7,  7,  8,  8,  8,  8,  9,  9,  9,  9, 10, 10, 10, 10, 11,
+       11, 11, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 15, 15, 16, 16,
+       16, 17, 17, 17, 18, 18, 18, 19, 19, 20, 20, 21, 21, 21, 22, 22,
+       23, 23, 24, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29, 30,
+       30, 31, 32, 32, 33, 33, 34, 34, 35, 35, 36, 37, 37, 38, 38, 39,
+       40, 40, 41, 41, 42, 43, 43, 44, 45, 45, 46, 47, 47, 48, 49, 50,
+       50, 51, 52, 52, 53, 54, 55, 55, 56, 57, 58, 58, 59, 60, 61, 62,
+       62, 63, 64, 65, 66, 67, 67, 68, 69, 70, 71, 72, 73, 74, 74, 75,
+       76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91,
+       92, 93, 94, 95, 96, 97, 98, 99,100,101,102,104,105,106,107,108,
+      109,110,111,113,114,115,116,117,118,120,121,122,123,125,126,127
+    ];
+    
     @staticmethod
     def from_html(colorstring):
         """ Create a color from RGB value given in HTML format '#RRGGBB'
@@ -59,7 +90,7 @@ class Color(object):
         return self.html()
 
     def __repr__(self):
-        return self.html()
+        return str(self)
 
     def _set(self, cid, val):
         self._rgb[cid] = min(255, max(0, int(round(val))))
@@ -67,6 +98,13 @@ class Color(object):
     @property
     def rgb_bytearray(self):
         return self._rgb
+
+    @property
+    def rgb_bytearray_gamma(self):
+        _rgb_gamma = bytearray(3)
+        for i in range(3):
+            _rgb_gamma[i] = Color.gammaTable[self.rgb_bytearray[i]] << 1
+        return _rgb_gamma
 
     @property
     def rgb_int(self):
@@ -96,40 +134,52 @@ class Color(object):
     def b(self, b):
         self._set(2, b)
 
+
 BLACK = Color.from_html("#000000")
 WHITE = Color.from_html("#FFFFFF")
 
+# -----------------------------------------------------------------------------
 
 class LedPixelsAbstract():
     def __init__(self, nb_pixel=25):
         self._nb_pixel = nb_pixel
-        self.colors = [Color() for _ in xrange(self._nb_pixel)]
+        self.colors = [Color() for _ in xrange(self.nb_pixel)]
         self.set_color_all(Color(255, 100, 0))
-        self.is_on = [True for _ in xrange(self._nb_pixel)]
+        self.is_on = [True for _ in xrange(self.nb_pixel)]
+
+    @property
+    def nb_pixel(self):
+        return self._nb_pixel
 
     def flush(self):
         raise NotImplementedError()
 
     def set_color(self, lnum, color):
-        assert 1 <= lnum <= self._nb_pixel
+        assert 1 <= lnum <= self.nb_pixel
         self.colors[lnum-1] = color
 
     def set_color_all(self, color):
-        for lnum in xrange(1, self._nb_pixel+1):
+        for lnum in xrange(1, self.nb_pixel+1):
             self.set_color(lnum, color)
+
+    def get_color(self, lnum):
+        if self.is_on[lnum-1]:
+            return self.colors[lnum-1]
+        else:
+            return BLACK
 
     def on(self, lnum=None):
         if lnum is None:
-            self.is_on = [True] * self._nb_pixel
+            self.is_on = [True] * self.nb_pixel
         else:
-            assert 1 <= lnum <= self._nb_pixel
+            assert 1 <= lnum <= self.nb_pixel
             self.is_on[lnum-1] = True
 
     def off(self, lnum=None):
         if lnum is None:
-            self.is_on = [False] * self._nb_pixel
+            self.is_on = [False] * self.nb_pixel
         else:
-            assert 1 <= lnum <= self._nb_pixel
+            assert 1 <= lnum <= self.nb_pixel
             self.is_on[lnum-1] = False
 
     def turn_on(self, lnum=None, color=None, flush=True):
@@ -147,20 +197,20 @@ class LedPixelsAbstract():
         if flush:
             self.flush()
 
+
 class LedPixels(LedPixelsAbstract):
     """ The WS2801 led string on rPy
     """
+    
     def __init__(self, nb_pixel=25):
         LedPixelsAbstract.__init__(self, nb_pixel)
         self._spidev = file("/dev/spidev0.0", "wb")
         fcntl.ioctl(self._spidev, 0x40046b04, array.array('L', [400000]))
 
     def flush(self):
-        for lnum, color in enumerate(self.colors):
-            if self.is_on[lnum]:
-                self._spidev.write(color.rgb_bytearray)
-            else:
-                self._spidev.write(BLACK.rgb_bytearray)
+        for lnum in range(1, self.nb_pixel+1):
+            color = self.get_color(lnum)
+            self._spidev.write(color.rgb_bytearray_gamma)
         self._spidev.flush()
 
 
@@ -171,11 +221,9 @@ class LedPixelsWebSimu(LedPixelsAbstract):
 
     def flush(self):
         colors = []
-        for lnum, color in enumerate(self.colors):
-            if self.is_on[lnum]:
-                colors.append(color.rgb_int)
-            else:
-                colors.append(BLACK.rgb_int)
+        for lnum in range(1, self.nb_pixel+1):
+            color = self.get_color(lnum)
+            colors.append(color.rgb_int)
         json_data = json.dumps(colors)
         headers = {'Content-Type': 'application/json'}
         requests.put(self._leds_url, data=json_data, headers=headers)
@@ -188,10 +236,8 @@ class LedPixelsFileStub(LedPixelsAbstract):
 
     def flush(self):
         with file("lapp_output/ledpixels", "w") as _spidev:
-            for lnum, color in enumerate(self.colors):
-                if self.is_on[lnum]:
-                    _spidev.write("%i %i %i" % color.rgb_int)
-                else:
-                    _spidev.write("%i %i %i" % BLACK.rgb_int)
+            for lnum in range(1, self.nb_pixel+1):
+                color = self.get_color(lnum)
+                _spidev.write("%i %i %i" % color.rgb_int)
                 _spidev.write("\n")
 
