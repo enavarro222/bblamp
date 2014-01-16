@@ -92,6 +92,7 @@ The BBLamp software is organise in three parts :
 
 
 The main directories are:
+
     .
     ├── blockly         # modified version of Blockly
     │   ├── ...
@@ -113,6 +114,7 @@ The main directories are:
 
 
 The web server python code is mainly at root level :
+
     .
     ├── api.py          # flask API to manage lapps
     ├── errors.py       # common lapps management errors
