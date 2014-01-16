@@ -345,5 +345,8 @@
     "PROCEDURES_HIGHLIGHT_DEF": "context menu - This appears on the context menu for function calls.  Selecting it causes the corresponding function definition to be highlighted (as shown at [[Translating:Blockly#context_menus]].",
     "PROCEDURES_CREATE_DO": "context menu - This appears on the context menu for function definitions. Selecting it creates a block to call the function.  \n\nParameters:\n* %1 - the name of the function.",
     "PROCEDURES_IFRETURN_TOOLTIP": "tooltip - If the first value is true, this causes the second value to be returned immediately from the enclosing function.",
-    "PROCEDURES_IFRETURN_WARNING": "warning - This appears if the user tries to use this block outside of a function definition."
+    "PROCEDURES_IFRETURN_WARNING": "warning - This appears if the user tries to use this block outside of a function definition.",
+    "BBLAMP_SETUP_TITLE": "block text - name of the 'setup' procedure block",
+    "BBLAMP_EVERY_TITLE": "block text - name of the 'every' procedure block",
+    "BBLAMP_EVERY_SECONDS": "block text - after an input that give an amount of seconds"
 }

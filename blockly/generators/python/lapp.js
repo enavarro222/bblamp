@@ -27,9 +27,20 @@ goog.provide('Blockly.Python.lapp');
 
 goog.require('Blockly.Python');
 
+Blockly.Python.LAMPAPP_IMPORT = 'from lampapp import LampApp';
+Blockly.Python.LAMPAPP_DEF = 'app = LampApp()';
+
+/**
+ * 
+ */
+Blockly.Python._lapp_needed = function(){
+  Blockly.Python.definitions_['import_lampapp'] = Blockly.Python.LAMPAPP_IMPORT;
+  Blockly.Python.definitions_['def_lampapp'] = Blockly.Python.LAMPAPP_DEF;
+}
+
+// Define a lapp "setup" procedure.
 Blockly.Python['lapp_setup'] = function(block) {
-  // Define a lapp "every" procedure.
-  
+  Blockly.Python._lapp_needed();
   // First, add a 'global' statement for every variable that is assigned.
   var globals = Blockly.Variables.allVariables(block);
   for (var i = globals.length - 1; i >= 0; i--) {
@@ -56,8 +67,9 @@ Blockly.Python['lapp_setup'] = function(block) {
   return null;
 };
 
+// Define a lapp "every" procedure.
 Blockly.Python['lapp_every'] = function(block) {
-  // Define a lapp "every" procedure.
+  Blockly.Python._lapp_needed();
   
   // First, add a 'global' statement for every variable that is assigned.
   var globals = Blockly.Variables.allVariables(block);
@@ -90,6 +102,8 @@ Blockly.Python['lapp_every'] = function(block) {
 
 
 Blockly.Python['lapp_wait'] = function(block) {
+  Blockly.Python._lapp_needed();
+
   var value_time = Blockly.Python.valueToCode(block, 'TIME', Blockly.Python.ORDER_ATOMIC) || '0';
   var dropdown_unit = block.getFieldValue('UNIT');
   // TODO: Assemble Python into code variable.
@@ -104,6 +118,8 @@ Blockly.Python['lapp_wait'] = function(block) {
 /******************************************************************************/
 
 Blockly.Python['leds_turn_on'] = function(block) {
+  Blockly.Python._lapp_needed();
+
   var value_id = Blockly.Python.valueToCode(block, 'ID', Blockly.Python.ORDER_ATOMIC) || 'None';
   var value_colour = Blockly.Python.valueToCode(block, 'COLOUR', Blockly.Python.ORDER_ATOMIC) || 'None';
   var code = 'app.lamp.turn_on('+value_id+', '+value_colour+')\n';
@@ -111,6 +127,8 @@ Blockly.Python['leds_turn_on'] = function(block) {
 };
 
 Blockly.Python['leds_turn_off'] = function(block) {
+  Blockly.Python._lapp_needed();
+
   var value_id = Blockly.Python.valueToCode(block, 'ID', Blockly.Python.ORDER_ATOMIC) || 'None';
   var code = 'app.lamp.turn_off('+value_id+')\n';
   return code;

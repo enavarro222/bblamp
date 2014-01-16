@@ -1,14 +1,14 @@
 #-*- coding:utf-8 -*-
 from __future__ import division
-from lapp import LampApp
 
-from ledpixels import Color
-
-app = LampApp()
+from lampapp import LampApp
+from lampapp.ledpixels import Color
 
 colorTop = None
 ColorBot = None
 i = None
+
+app = LampApp()
 
 @app.every(2)
 def every():

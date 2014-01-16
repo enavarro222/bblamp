@@ -29,7 +29,7 @@ goog.require('Blockly.Python');
 
 // If any new block imports any library, add that library name here.
 Blockly.Python.addReservedWords('Color');
-Blockly.Python.COLOR_IMPORT = 'from ledpixels import Color'
+Blockly.Python.COLOR_IMPORT = 'from lampapp.ledpixels import Color'
 
 Blockly.Python['colour_picker'] = function(block) {
   Blockly.Python.definitions_['import_color'] = Blockly.Python.COLOR_IMPORT;

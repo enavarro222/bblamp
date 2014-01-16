@@ -133,14 +133,10 @@ Blockly.Python.finish = function(code) {
   var lapp_header = [];
   lapp_header.push('#-*- coding:utf-8 -*-');
   lapp_header.push('from __future__ import division');
-  lapp_header.push('from lapp import LampApp\n');
   
   // Convert the definitions dictionary into a list.
   var imports = [];
   var definitions = [];
-  // Lapp definition
-  definitions.push('app = LampApp()');
-  // other definitions
   for (var name in Blockly.Python.definitions_) {
     var def = Blockly.Python.definitions_[name];
     if (def.match(/^(from\s+\S+\s+)?import\s+\S+/)) {

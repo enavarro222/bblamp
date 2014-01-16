@@ -7,15 +7,15 @@ goog.provide('Blockly.Msg.hi');
 goog.require('Blockly.Msg');
 
 Blockly.Msg.ADD_COMMENT = "टिप्पणी छोड़ें";
-Blockly.Msg.BBLAMP_EVERY_SECONDS = "seconds";  // untranslated
-Blockly.Msg.BBLAMP_EVERY_TITLE = "every";  // untranslated
-Blockly.Msg.BBLAMP_SETUP_TITLE = "at setup";  // untranslated
-Blockly.Msg.BBLAMP_TURNOFF_TITLE = "turn off led";  // untranslated
-Blockly.Msg.BBLAMP_TURNON_TITLE = "turn on led";  // untranslated
-Blockly.Msg.BBLAMP_TURNON_TOCOLOR = "to colour";  // untranslated
-Blockly.Msg.BBLAMP_WAIT_MILLISECONDS = "milliseconds";  // untranslated
-Blockly.Msg.BBLAMP_WAIT_SECONDS = "seconds";  // untranslated
-Blockly.Msg.BBLAMP_WAIT_TITLE = "wait";  // untranslated
+Blockly.Msg.BBLAMP_EVERY_SECONDS = "secondes";  // untranslated
+Blockly.Msg.BBLAMP_EVERY_TITLE = "chaque";  // untranslated
+Blockly.Msg.BBLAMP_SETUP_TITLE = "à l'initialisation";  // untranslated
+Blockly.Msg.BBLAMP_TURNOFF_TITLE = "éteindre la led";  // untranslated
+Blockly.Msg.BBLAMP_TURNON_TITLE = "allumer la led";  // untranslated
+Blockly.Msg.BBLAMP_TURNON_TOCOLOR = "en couleur";  // untranslated
+Blockly.Msg.BBLAMP_WAIT_MILLISECONDS = "millisecondes";  // untranslated
+Blockly.Msg.BBLAMP_WAIT_SECONDS = "secondes";  // untranslated
+Blockly.Msg.BBLAMP_WAIT_TITLE = "attendre";  // untranslated
 Blockly.Msg.CHANGE_VALUE_TITLE = "मान परिवर्तित करें:";
 Blockly.Msg.COLLAPSE_ALL = "ब्लॉक संक्षिप्त करें";
 Blockly.Msg.COLLAPSE_BLOCK = "ब्लॉक को संक्षिप्त करें";

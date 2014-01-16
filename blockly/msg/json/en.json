@@ -1,7 +1,7 @@
 {
     "@metadata": {
         "author": "Ellen Spertus <ellen.spertus@gmail.com>",
-        "lastupdated": "2014-01-08 21:10:38.763257",
+        "lastupdated": "2014-01-12 10:18:08.391088",
         "locale": "en",
         "messagedocumentation" : "qqq"
     },
@@ -352,13 +352,7 @@
     "PROCEDURES_CREATE_DO": "Create '%1'",
     "PROCEDURES_IFRETURN_TOOLTIP": "If a value is true, then return a second value.",
     "PROCEDURES_IFRETURN_WARNING": "Warning: This block may be used only within a function definition.",
-    "BBLAMP_SETUP_TITLE": "at setup",
+    "BBLAMP_SETUP_TITLE": "setup",
     "BBLAMP_EVERY_TITLE": "every",
-    "BBLAMP_EVERY_SECONDS": "seconds",
-    "BBLAMP_TURNON_TITLE": "turn on led",
-    "BBLAMP_TURNON_TOCOLOR": "to colour",
-    "BBLAMP_TURNOFF_TITLE": "turn off led",
-    "BBLAMP_WAIT_TITLE": "wait",
-    "BBLAMP_WAIT_SECONDS": "seconds",
-    "BBLAMP_WAIT_MILLISECONDS": "milliseconds"
+    "BBLAMP_EVERY_SECONDS": "seconds"
 }

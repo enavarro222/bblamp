@@ -21,11 +21,17 @@ Installation
 Require (Software)
 ----------------
 
+for the wimote:
+
+* bluez
+* python-cwiid
+
 #### python:
 * flask
 * gevent >= 1.0 (https://pypi.python.org/pypi/gevent)
 * requests
 * sseclient (https://pypi.python.org/pypi/sseclient)
+
 
 #### javascript:
 * jquery
@@ -57,33 +63,67 @@ WS2801 strips have 4 wires and can easily be driven by a rPi, whereas WS2811 str
 We aim to add :
 
 * light sensor (i3c)
-* humidity and temp sensor (DHT22)
+* humidity and temp sensor (DHT22/AM2302)
 * push button
 * PIR sensor
 * small mic
 * small speakers
+* wimote
 
-Files and directories
--------------------
+Design, Files and directories
+--------------------------
+
+The BBLamp software is organise in three parts :
+* the lamp aplications (or "lapp"):
+ - created by the users,
+ - coded in python, 
+ - stored in "user_apps/",
+ - based on python modules (hardware drivers ...) which are un "lampapp/".
+* edition app:
+ - coded in javascript,
+ - use Blockly for lamp app creation
+ - use ACE for python editing
+ - mainly in "static/" and in "templates"
+* the webserver:
+ - serve the "edition app"
+ - manage lapps (Create, Read, Update, Delete, and also: Run, Stop, Status)
+ - manage a lamp hardware simulator
+ - written in python (with Flask)
+
 
 The main directories are:
-
     .
-    ├── blockly         # modified version of blockly
-    ├── lapp            # contains all user defined programs (lapp is for "lamp app")
-    ├── lapp_output     # outputs files of running user defined program
-    ├── static          # static (js/css) files
-    ├── templates       # html templates
-    └── tests           # tests files
+    ├── blockly         # modified version of Blockly
+    │   ├── ...
+    │   ├── blocks      # contains blocks description
+    │   ├── ...
+    │   ├── generators  # contains blockscode generator
+    │   ├── ...
+    │   ├── msg         # contains blockly i18n files
+    │   └── ...
+    ├── lampapp         # python files for lamp app creation, hardware drivers
+    ├── lapp_output     # contains lamp app outputs file (used to communicate with the webserver)
+    ├── static          # webapp static files
+    │   ├── blockly -> ../blockly # link to blockly
+    │   ├── jslib       # bunch of std JS libs
+    │   └── locales     # webapp i18n files (use i18next)
+    ├── templates       # web app templates (flask templates)
+    ├── tests           # ...
+    └── user_apps       # contains application created by users
 
-Also for now most of the python codes are (for now) loose at root directory:
 
-    api.py              # flask API to manage lapps
-    errors.py           # commmun errors
-    ledpixels.py        # leds drivers class
-    simulate.py         # flask API for html hardware similator
-    utils.py            # some useful helpers
-    webserver.py        # main program for the webserver (use flask + gevent WSGI)
+The web server python code is mainly at root level :
+    .
+    ├── api.py          # flask API to manage lapps
+    ├── errors.py       # common lapps management errors
+    ├── simulate.py     # lamp hardware simulator API
+    ├── static          # static files (ie JS edition app)
+    ├── templates       # templates, ie JS edition app main page
+    ├── utils.py        # some helpers
+    └── webserver.py    # webserer main program
+
+The lapp are based on python modules that are in "lampapp"~:
+TODO: description of these files 
 
 
 Lamp app or a "lapp"
@@ -138,6 +178,10 @@ Here is the description of BBLamp specific blocks.
 * wait: make a pause of a given time
 * on
 
+For the WiMote:
+* start rumble
+* stop rumble
+* on button {1, 2, A, B, HAUT, BAS, GAUCHE, DROITE} push
 
 
 lapp web editor/manager
@@ -164,6 +208,10 @@ lapp web editor/manager
 TODO
 ----
 
+- [ ] UI: bug on chrome (at least) short cut don't work after "some time"
+- [ ] hard: cleaner power plugs
+- [ ] hard: manage DHT22
+- [ ] UI: manage loading
 - [ ] UI: template JS dans un fichier static ?
 - [ ] **H** UI: new lapp (popup with form to choose the name)
 - [ ] **H** UI: prevent quit without save
@@ -175,12 +223,14 @@ TODO
 - [ ] UI: blockly: add "pause of TIME milliseconds"
 - [ ] UI: blockly: make "block bags"
 - [ ] UI: blockly: add an HSV color builder
+- [ ] UI: blockly: add a block "number of leds"
 - [ ] UI: blockly: i18n automatic load good i18n js file
 - [ ] UI: blockly: variables blocs and trunon/turnoff have same color
 - [ ] UI: run/stop/etc... check ajax call error
 - [ ] UI: remove an app (with confirmation)
 - [ ] UI: discard changes (with confirmation)
 - [ ] UI: (BUG) event may deconect
+- [ ] UI: (BUG) when no lapps
 - [ ] UI: remaster the layout : editor full width, except when simulator on right
 - [ ] UI: clean simulator model (and view)
 - [ ] UI: front page: list of apps in full width
@@ -217,6 +267,8 @@ TODO
 - [ ] install a demo version on a public server (with pswd)
 
 #### Done:
+- [x] lapp: check color correction
+- [x] hard: how many amp for led ? ==> up to 60mA per LED => 1500 mA for 25 leds
 - [x] UI: add ctrl-* shortcuts http://craig.is/killing/mice
 - [x] UI: editor ace: autocompletion
 - [x] lapp: move to event based ! (every k sec, on button pressed, etc...)

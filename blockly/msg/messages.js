@@ -1080,3 +1080,26 @@ Blockly.Msg.PROCEDURES_CREATE_DO = 'Create "%1"';
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = 'If a value is true, then return a second value.';
 /// warning - This appears if the user tries to use this block outside of a function definition.
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = 'Warning: This block may be used only within a function definition.';
+
+
+// BBLamp custom blocks
+/// block text - name of the "setup" procedure block
+Blockly.Msg.BBLAMP_SETUP_TITLE = 'setup';
+/// block text - name of the "every" procedure block
+Blockly.Msg.BBLAMP_EVERY_TITLE = 'every';
+/// block text - after an input that give an amount of seconds
+Blockly.Msg.BBLAMP_EVERY_SECONDS = 'seconds';
+/// block text - name of the block that turn on a led ("turn on led LED_ID to color COLOR")
+Blockly.Msg.BBLAMP_TURNON_TITLE = "turn on led';
+/// block text - in the block that turn on a led, before the choice of the color
+Blockly.Msg.BBLAMP_TURNON_TOCOLOR = "to colour';
+/// block text - name of the block that turn off a led
+Blockly.Msg.BBLAMP_TURNOFF_TITLE = "turn off led';
+/// block text - name of the "wait" procedure block
+Blockly.Msg.BBLAMP_WAIT_TITLE = "wait';
+/// block text - after an input that give an amount of seconds
+Blockly.Msg.BBLAMP_WAIT_SECONDS = "seconds';
+/// block text - after an input that give an amount of milli seconds
+Blockly.Msg.BBLAMP_WAIT_MILLISECONDS = "milliseconds';
+
+

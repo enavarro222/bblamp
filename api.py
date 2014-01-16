@@ -20,7 +20,7 @@ from errors import LappRunning, LappNotRunning
 lapps = Blueprint('lapps', __name__)
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
-LAPP_DIR = os.path.join(BASEDIR, "lapp/")
+LAPP_DIR = os.path.join(BASEDIR, "user_apps/")
 LAPP_USER = "navarro"
 #LAPP_USER = "pi"
 LAPP_OUTDIR = os.path.join(BASEDIR, "lapp_output/")
