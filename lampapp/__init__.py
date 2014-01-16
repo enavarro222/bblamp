@@ -9,7 +9,8 @@ import time
 import gevent
 
 #from ledpixels import LedPixelsFileStub as LedPixels
-from ledpixels import LedPixelsWebSimu as LedPixels
+#from ledpixels import LedPixelsWebSimu as LedPixels
+from ledpixels import LedPixels
 
 from utils import read_lapp_pidfile, write_lapp_pidfile
 
@@ -22,14 +23,37 @@ class LampApp(object):
         self.log = logging.getLogger("LampApp")
         # stdout (for self.print)
         self._stdout_filemane = None
-        ## "hardware" driver init
-        #TODO make hardwaire configurable
-        # init leds
-        self.lamp = LedPixels(self.NBPIXEL)
-        self.lamp.off()
         ## events callbacks
         self._setup_fct = None
         self._to_spawn = []
+
+    def activate_lamp(self):
+        """ make lamp (led pixels) available
+        """
+        self.lamp = LedPixels(self.NBPIXEL)
+        self.lamp.off()
+
+    def activate_wiimote(self):
+        """ make wiimote available
+        """
+        from wiimote import Wiimote, WiimoteError
+        self.wiimote = Wiimote()
+        def check_reconnect():
+            connected = False
+            while True:
+                # connect the wiimote
+                if not self.wiimote.connected():
+                    try:
+                        print("connecting...")
+                        self.wiimote.connect()
+                        self.wait(0.4)
+                        print("connected")
+                    except WiimoteError:
+                        print("connection fail")
+                        self.wait(0.2)
+                else:
+                    self.wait(0.4)
+        self._to_spawn.append(check_reconnect)
 
     def _run_log(self, fn):
         """ Run a fct and log exception (if any)
@@ -141,6 +165,8 @@ class LampApp(object):
         fhandler.setFormatter(formatter)
         self.log.addHandler(fhandler)
         try:
+            ## configure hardware
+            self.activate_lamp()
             ## fill pid file
             write_lapp_pidfile(args.pidfile)
             ## out file for self.msg

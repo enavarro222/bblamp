@@ -3,8 +3,8 @@ import time
 from random import randint, gauss
 from colorsys import hls_to_rgb
 
-from lapp import LampApp
-from ledpixels import Color
+from lampapp import LampApp
+from lampapp.ledpixels import Color
 
 app = LampApp()
 

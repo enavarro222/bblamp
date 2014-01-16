@@ -6,19 +6,52 @@ import time
 
 from ledpixels import LedPixels
 
+rose = (255, 50, 50)
+vert = (60, 204, 10)
+
+npixels = 25
+traine = 4
+
+def borne(val):
+    val = max(val, 0)
+    val = min(val, npixels)
+    return val
+# x x x x x x x
+# T Q Q
+def pixels(pos, traine, direction):
+    tete = borne(pos)
+    if direction:
+        queue = range(borne(tete-traine), tete)
+    else:
+        queue = range(tete+1, borne(tete+traine+1))
+    return tete, queue
 
 def main():
-    npixels = 25
     lamp = LedPixels(npixels)
     lamp.all_off()
     lamp.flush()
-    lnum = 0
-    for _ in range(26):
-        lamp.switch_off(lnum)
-        lnum = (lnum + 1) % npixels
-        lamp.switch_on(lnum)
+    pos = 0
+    direction = True
+    for _ in range(90*26):
+        pos += 1 if direction else -1
+        pos %= npixels
+        if direction and pos == npixels - 1:
+            print("change direction")
+            direction = not direction
+            pos = npixels - traine
+        if not direction and pos == 0:
+            print("change direction")
+            direction = not direction
+            pos = traine
+        lamp.all_off()
+        tete, queue = pixels(pos, traine, direction)
+        lamp.set_color(tete, *rose)
+        lamp.switch_on(tete)
+        for val in queue:
+            lamp.set_color(val, *vert)
+            lamp.switch_on(val)
         lamp.flush()
-        time.sleep(0.1)
+        time.sleep(0.05)
     
     lamp.set_color_all(255, 50, 50)
     lamp.all_on()
