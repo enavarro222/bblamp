@@ -14,6 +14,18 @@ This project is very young but in (active) development. Feel free to contact me 
 Installation
 -----------
 
+install depencies:
+$ sudo apt-get install python-pip python-dev
+$ sudo pip insall gevent  # need gevent >= 1.0
+$ sudo pip insall flask
+
+Note: python-dev are needed to install gevent.
+
+$ git clone https://github.com/enavarro222/bblamp.git
+$ cd bblamp
+$ run webserver.py
+
+
 #### TODO :
 * install it on a std linux computer without any special hardware
 * install it on a rPi with led strip and sensors...
