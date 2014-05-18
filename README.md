@@ -15,15 +15,20 @@ Installation
 -----------
 
 install depencies:
-$ sudo apt-get install python-pip python-dev
-$ sudo pip insall gevent  # need gevent >= 1.0
-$ sudo pip insall flask
+
+    $ sudo apt-get install python-pip python-dev
+    $ sudo pip insall gevent  # need gevent >= 1.0
+    $ sudo pip insall flask
 
 Note: python-dev are needed to install gevent.
 
-$ git clone https://github.com/enavarro222/bblamp.git
-$ cd bblamp
-$ run webserver.py
+    $ git clone https://github.com/enavarro222/bblamp.git
+    $ cd bblamp
+    $ make get-ace
+    $ make install-ace
+    $ make get-bootstrap
+    $ make install-bootstrap
+    $ run webserver.py
 
 
 #### TODO :
