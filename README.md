@@ -19,6 +19,7 @@ install depencies:
     $ sudo apt-get install python-pip python-dev
     $ sudo pip insall gevent  # need gevent >= 1.0
     $ sudo pip insall flask
+    $ sudo pip insall requests
 
 Note: python-dev are needed to install gevent.
 
