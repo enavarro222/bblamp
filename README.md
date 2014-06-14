@@ -31,6 +31,10 @@ Note: python-dev are needed to install gevent.
     $ make install-bootstrap
     $ run webserver.py
 
+activate SPI on rPy:
+
+    $ sudo vim /etc/modprobe.d/raspi-blacklist.conf
+    # add a '#' before line "blacklist spi-bcm2708"
 
 #### TODO :
 * install it on a std linux computer without any special hardware
