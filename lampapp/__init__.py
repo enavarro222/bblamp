@@ -8,14 +8,22 @@ import time
 
 import gevent
 
-#from ledpixels import LedPixelsFileStub as LedPixels
-#from ledpixels import LedPixelsWebSimu as LedPixels
-from ledpixels import LedPixels
-
 from utils import read_lapp_pidfile, write_lapp_pidfile
 
+class BBLampHardware(object):
+    default_attr_name = None
+
+    def __init__(self):
+        pass
+
+    def activate(self, app):
+        pass
+
+    def exit(self, app):
+        pass
+
+
 class LampApp(object):
-    NBPIXEL = 25
 
     def __init__(self):
         #logging
@@ -27,10 +35,38 @@ class LampApp(object):
         self._setup_fct = None
         self._to_spawn = []
 
+    def need(self, hardware_class, attr_name=None):
+        """ Register a given piece of hardware
+        """
+        #assert isinstance(hardware_class, BBLampHardware)
+        if attr_name is None:
+            attr_name = hardware_class.default_attr_name
+        if attr_name in self._hardware:
+            raise ValueError("Hardware already present on same attribute name")
+        else:
+            hardware = hardware_class()
+            self.__setattr__(attr_name, hardware)
+            self._hardware[attr_name] = hardware
+
+    def _activate_hardware(self):
+        for attr, hardware in self._hardware.iteritems:
+            hardware.activate(self)
+
+    def _exit(self):
+        #for attr, hardware in self._hardware.iteritems:
+        #    hardware.exit(self)
+        sys.exit()
+
     def activate_lamp(self):
         """ make lamp (led pixels) available
         """
-        self.lamp = LedPixels(self.NBPIXEL)
+        from ledpixels import LedPixels
+        #self.need(LedPixels)
+        
+        #from ledpixels import LedPixelsFileStub as LedPixels
+        #from ledpixels import LedPixelsWebSimu as LedPixels
+        NBPIXEL = 25+32
+        self.lamp = LedPixels(NBPIXEL)
         self.lamp.off()
 
     def activate_wiimote(self):
@@ -44,12 +80,12 @@ class LampApp(object):
                 # connect the wiimote
                 if not self.wiimote.connected():
                     try:
-                        print("connecting...")
+                        self.log.info("Connecting to WiiMote...")
                         self.wiimote.connect()
                         self.wait(0.4)
-                        print("connected")
+                        self.log.info("Connected to WiiMote !")
                     except WiimoteError:
-                        print("connection fail")
+                        self.log.info("Connection to WiiMote failed !")
                         self.wait(0.2)
                 else:
                     self.wait(0.4)
@@ -93,25 +129,12 @@ class LampApp(object):
             return fn
         return every_deco
     
-    def on(self, obj, event):
-        """ Function decorator to declare an function to be run on an event
-        """
-        #TODO
-        def on_deco(fn):
-            return fn
-        return on_deco
-    
     def msg(self, msg):
         """ print a message
         """
         if self._stdout_filemane:
             with open(self._stdout_filemane, "a") as stdout:
                 stdout.write("%s\n" % msg)
-
-    def on_exit(self):
-        if self.lamp:
-            self.lamp.turn_off()
-        sys.exit()
 
     def wait(self, time):
         gevent.sleep(time)
@@ -129,9 +152,9 @@ class LampApp(object):
         * in a infinite loop, call self.loop()
         """
         # clean all at exit
-        signal.signal(signal.SIGTERM, lambda signum, frame: self.on_exit())
+        signal.signal(signal.SIGTERM, lambda signum, frame: self._exit())
         # cmd line argument parser
-        parser = argparse.ArgumentParser(description='bb-lamp App.')
+        parser = argparse.ArgumentParser(description='BBLamp Application')
         outdir = "./lapp_output/"
         parser.add_argument(
             '--logfile', dest='logfile', type=str, default=outdir+"/lapp.log",

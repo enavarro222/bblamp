@@ -124,7 +124,7 @@ The web server python code is mainly at root level :
     ├── utils.py        # some helpers
     └── webserver.py    # webserer main program
 
-The lapp are based on python modules that are in "lampapp"~:
+The lapp are based on python modules that are in "lampapp" :
 TODO: description of these files 
 
 
@@ -132,7 +132,7 @@ Lamp app or a "lapp"
 ------------------
 
 #### some requirements:
-* autonomous python program
+* autonomous python program (only depends on "lampapp" module)
 * could be written using blockly
 * only one running at a time
 * is run as a service
@@ -146,9 +146,11 @@ Lamp app or a "lapp"
 #### Exemple:
 ```python
 #-*- coding:utf-8 -*-
-from lapp import LampApp
+from lampapp import LampApp
+from lampapp.ledpixels import LedPixels
 
 app = LampApp()
+app.need("lamp")
 
 @app.setup()
 def setup():
@@ -168,6 +170,72 @@ def loop():
 if __name__ == "__main__":
     app.run()
 ```
+
+### Hardware managment
+
+* declare/get "what" is used by a lapp
+* declare/get "what" is availble
+* (lapp) activate an hardware module
+* (ui) load blocks for an hardware module
+* (webserer) check if a app may be run or not (hardware available)
+* configure hardware (number of led)
+* switch between different hardware (simulation or not)
+
+
+* abstract class : BBLampHarware
+ - default attribute name ('lamp', 'wiimote', ...)
+* app.need(WiMote)
+ - activate the 
+* "python ./mylapp.py --list-hardware"
+
+```python
+#-*- coding:utf-8 -*-
+from lampapp import LampApp
+
+app = LampApp()
+
+# manualy load an hardware driver
+from lampapp.ledpixels import LedPixels
+app.load("lamp", LedPixels(nb_pixel=32))
+
+app.lamp.on()
+```
+
+```python
+#-*- coding:utf-8 -*-
+from lampapp import LampApp
+
+app = LampApp()
+# load a hardware driver which is declared in hardware.conf
+app.need("lamp")
+
+app.lamp.on()
+```
+
+hardware.conf
+```
+[lamp]
+driver=lampapp.ledpixels.LedPixels
+nb_pixel=25
+```
+
+hardware.json
+```
+BBLampHardware = {
+    'lamp': {
+        'driver':'lampapp.ledpixels.LedPixels',
+        'options':{
+            'nb_pixel': 25
+        },
+        ''
+    }
+}
+
+
+hardware :
+* a python class
+* some blocks
+* simulation view, server code ?
 
 
 BBLamp custom blocks
