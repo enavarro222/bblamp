@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-from lapp import LampApp
+from lampapp import LampApp
 from ledpixels import Color
 
 app = LampApp()
@@ -36,7 +36,7 @@ def loop():
         if count % period[k] == 0:
             if position[k] == 1:
                 sens[k] = 1
-            elif position[k] == 24:
+            elif position[k] == 25+32:
                 sens[k] = -1
             position[k] += sens[k]    
 

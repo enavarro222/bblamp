@@ -26,8 +26,9 @@ def setup():
 def every():
     global couleur, i
     couleur = acc_to_color()
-    for i in range(1, 26):
-        app.lamp.turn_on(i, couleur)
+    app.lamp.turn_on(color=couleur)
+    #for i in range(1, 26):
+    #    app.lamp.turn_on(i, couleur)
 
 
 if __name__ == "__main__":

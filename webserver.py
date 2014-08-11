@@ -15,10 +15,13 @@ from flask import render_template, jsonify
 from utils import ServerSentEvent
 
 from api import lapps
-from api import get_lapp_status, LAPP_LOGFILE, LAPP_OUTFILE
+from api import get_lapp_status
 from errors import BBLampException
 
+#TODO: hardware ?
 from simulate import simu
+
+import config
 
 # the Flask app
 bblamp_app = Flask(__name__)
@@ -129,10 +132,10 @@ def monitor_logging_file(filename, output_fct):
                 raise
 
 def monitor_lapp_logfile():
-    monitor_logging_file(LAPP_LOGFILE, new_lapp_logmsg)
+    monitor_logging_file(config.LAPP_LOGFILE, new_lapp_logmsg)
 
 def monitor_lapp_outfile():
-    monitor_logging_file(LAPP_OUTFILE, new_lapp_output)
+    monitor_logging_file(config.LAPP_OUTFILE, new_lapp_output)
 
 def monitor_lapp_status():
     while True:

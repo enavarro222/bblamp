@@ -10,17 +10,7 @@ import gevent
 
 from utils import read_lapp_pidfile, write_lapp_pidfile
 
-class BBLampHardware(object):
-    default_attr_name = None
-
-    def __init__(self):
-        pass
-
-    def activate(self, app):
-        pass
-
-    def exit(self, app):
-        pass
+import config
 
 
 class LampApp(object):
@@ -34,40 +24,29 @@ class LampApp(object):
         ## events callbacks
         self._setup_fct = None
         self._to_spawn = []
+        # hardware elements
+        self._hardware = {}
 
-    def need(self, hardware_class, attr_name=None):
+    def need(self, hardware_name):
         """ Register a given piece of hardware
         """
-        #assert isinstance(hardware_class, BBLampHardware)
-        if attr_name is None:
-            attr_name = hardware_class.default_attr_name
-        if attr_name in self._hardware:
-            raise ValueError("Hardware already present on same attribute name")
-        else:
-            hardware = hardware_class()
-            self.__setattr__(attr_name, hardware)
-            self._hardware[attr_name] = hardware
+        if hardware_name not in config.hardware:
+            raise ValueError("Hardware '%s' is not available !" % hardware_name)
+        if hardware_name in self._hardware:
+            raise ValueError("Hardware already present")
+
+        hardware = config.hardware[hardware_name]
+        self._hardware[hardware_name] = hardware
+        self.__setattr__(hardware_name, hardware)
 
     def _activate_hardware(self):
-        for attr, hardware in self._hardware.iteritems:
+        for attr, hardware in self._hardware.iteritems():
             hardware.activate(self)
 
     def _exit(self):
-        #for attr, hardware in self._hardware.iteritems:
-        #    hardware.exit(self)
+        for attr, hardware in self._hardware.iteritems:
+            hardware.exit(self)
         sys.exit()
-
-    def activate_lamp(self):
-        """ make lamp (led pixels) available
-        """
-        from ledpixels import LedPixels
-        #self.need(LedPixels)
-        
-        #from ledpixels import LedPixelsFileStub as LedPixels
-        #from ledpixels import LedPixelsWebSimu as LedPixels
-        NBPIXEL = 25+32
-        self.lamp = LedPixels(NBPIXEL)
-        self.lamp.off()
 
     def activate_wiimote(self):
         """ make wiimote available
@@ -90,19 +69,6 @@ class LampApp(object):
                 else:
                     self.wait(0.4)
         self._to_spawn.append(check_reconnect)
-
-    def _run_log(self, fn):
-        """ Run a fct and log exception (if any)
-        """
-        error = None
-        try:
-            fn()
-        except Exception as err:
-            self.log.exception("uncaught exception:")
-            if self.debug:
-                raise
-            error = err
-        return error
 
     def setup(self):
         """ Function decorator to declare an function to be run at start up
@@ -139,6 +105,20 @@ class LampApp(object):
     def wait(self, time):
         gevent.sleep(time)
 
+
+    def _run_log(self, fn):
+        """ Run a fct and log exception (if any)
+        """
+        error = None
+        try:
+            fn()
+        except Exception as err:
+            self.log.exception("uncaught exception:")
+            if self.debug:
+                raise
+            error = err
+        return error
+
     def run(self):
         """ Run the lapp, ie:
         * setup and parse args
@@ -155,17 +135,16 @@ class LampApp(object):
         signal.signal(signal.SIGTERM, lambda signum, frame: self._exit())
         # cmd line argument parser
         parser = argparse.ArgumentParser(description='BBLamp Application')
-        outdir = "./lapp_output/"
         parser.add_argument(
-            '--logfile', dest='logfile', type=str, default=outdir+"/lapp.log",
+            '--logfile', dest='logfile', type=str, default=config.LAPP_LOGFILE,
             help='path of the logging file'
             )
         parser.add_argument(
-            '--outfile', dest='outfile', type=str, default=outdir+"/lapp.out",
+            '--outfile', dest='outfile', type=str, default=config.LAPP_OUTFILE,
             help='path for the output (print) file'
             )
         parser.add_argument(
-            '--pidfile', dest='pidfile', type=str, default=outdir+"/lapp.pid",
+            '--pidfile', dest='pidfile', type=str, default=config.LAPP_PIDFILE,
             help='path of the PID file'
             )
         args = parser.parse_args()
@@ -187,9 +166,11 @@ class LampApp(object):
             )
         fhandler.setFormatter(formatter)
         self.log.addHandler(fhandler)
+        #
+        # run the app
         try:
             ## configure hardware
-            self.activate_lamp()
+            self._activate_hardware()
             ## fill pid file
             write_lapp_pidfile(args.pidfile)
             ## out file for self.msg

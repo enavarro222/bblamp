@@ -202,11 +202,13 @@ if __name__ == "__main__":
 * (webserer) check if a app may be run or not (hardware available)
 * configure hardware (number of led)
 * switch between different hardware (simulation or not)
+* user (app) declare what a need (class name)
+* root declare available class
 
 
 * abstract class : BBLampHarware
  - default attribute name ('lamp', 'wiimote', ...)
-* app.need(WiMote)
+* app.need("WiMote")
  - activate the 
 * "python ./mylapp.py --list-hardware"
 

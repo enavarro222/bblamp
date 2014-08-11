@@ -7,6 +7,8 @@ import fcntl
 import requests
 import json
 
+from hardware import BBLampHardware
+
 # --- 
 class Color(object):
     """ Color object, internal representation is 3 octets for rgb
@@ -140,12 +142,19 @@ WHITE = Color.from_html("#FFFFFF")
 
 # -----------------------------------------------------------------------------
 
-class LedPixelsAbstract():
+class LedPixelsAbstract(BBLampHardware):
     def __init__(self, nb_pixel=25):
+        super(LedPixelsAbstract, self).__init__()
         self._nb_pixel = nb_pixel
         self.colors = [Color() for _ in xrange(self.nb_pixel)]
         self.set_color_all(Color(255, 100, 0))
         self.is_on = [True for _ in xrange(self.nb_pixel)]
+
+    def activate(self, app):
+        self.off()
+
+    def exit(self, app):
+        self.off()
 
     @property
     def nb_pixel(self):
@@ -155,7 +164,7 @@ class LedPixelsAbstract():
         raise NotImplementedError()
 
     def set_color(self, lnum, color):
-        assert 1 <= lnum <= self.nb_pixel
+        assert 1 <= lnum <= self.nb_pixel, "'%s' is not a valid led number" % lnum
         self.colors[lnum-1] = color
 
     def set_color_all(self, color):
@@ -172,14 +181,14 @@ class LedPixelsAbstract():
         if lnum is None:
             self.is_on = [True] * self.nb_pixel
         else:
-            assert 1 <= lnum <= self.nb_pixel
+            assert 1 <= lnum <= self.nb_pixel, "'%s' is not a valid led number" % lnum
             self.is_on[lnum-1] = True
 
     def off(self, lnum=None):
         if lnum is None:
             self.is_on = [False] * self.nb_pixel
         else:
-            assert 1 <= lnum <= self.nb_pixel
+            assert 1 <= lnum <= self.nb_pixel, "'%s' is not a valid led number" % lnum
             self.is_on[lnum-1] = False
 
     def turn_on(self, lnum=None, color=None, flush=True):

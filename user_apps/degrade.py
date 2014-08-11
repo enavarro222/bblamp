@@ -15,8 +15,9 @@ def every():
     global colorTop, ColorBot, i
     colorTop = Color.random()
     ColorBot = Color.random()
-    for i in range(1, 26):
+    for i in range(1, 58):
         app.lamp.turn_on(i, Color.blend(colorTop, ColorBot, i / 24))
+        app.wait((100) / 1000.)
 
 
 if __name__ == "__main__":

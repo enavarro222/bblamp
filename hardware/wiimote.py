@@ -6,14 +6,15 @@ from cwiid import BTN_2, BTN_1, BTN_B, BTN_A, \
     BTN_MINUS, BTN_HOME, BTN_PLUS, \
     BTN_LEFT, BTN_RIGHT, BTN_DOWN, BTN_UP
 
+from hardware import BBLampHardware
+
 PRESSED = 1
 RELEASED = 2
-
 
 class WiimoteError(RuntimeError):
     pass
 
-class Wiimote():
+class Wiimote(BBLampHardware):
 
     BTNS = [
         (cwiid.BTN_2, "2"),           # 1
@@ -30,6 +31,7 @@ class Wiimote():
     ]
 
     def __init__(self):
+        super(BBLampHardware, self).__init__()
         self._connected = False
         self._wm = None
         self._led = 0
@@ -37,6 +39,9 @@ class Wiimote():
         self._last_btn = 0
         # init callbacks
         self._on = {} # self._on[BTN][PRESSED]
+
+    def activate(self):
+        self.connect()
 
     def connect(self):
         #TODO: add msg throw log ?

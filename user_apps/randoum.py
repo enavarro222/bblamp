@@ -22,9 +22,9 @@ def setup():
 
     #colorsys.hls_to_rgb(h, l, s)
     saturation = 0.7
-    light = 0.4
+    light = 0.3
     
-    colors = [ randColor(light, saturation, mu=0) for _ in range(0, 25) ]
+    colors = [ randColor(light, saturation, mu=0) for _ in range(0, app.lamp.nb_pixel) ]
 
     
 @app.every(0.05)
@@ -37,10 +37,10 @@ def loop():
     mu = (count / 900.) % 1
     # change one color:
     for _ in range(randint(0, 2)):
-        k = randint(0, 24)
+        k = randint(0, app.lamp.nb_pixel-1)
         colors[k] = randColor(light, saturation, mu=mu)
     
-    for k in range(0, 25):
+    for k in range(0, app.lamp.nb_pixel):
         app.lamp.turn_on(k+1, colors[k], flush=False)
 
     app.lamp.flush()

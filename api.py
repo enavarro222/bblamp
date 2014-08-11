@@ -19,14 +19,8 @@ from errors import LappRunning, LappNotRunning
 
 lapps = Blueprint('lapps', __name__)
 
-BASEDIR = os.path.dirname(os.path.abspath(__file__))
-LAPP_DIR = os.path.join(BASEDIR, "user_apps/")
-LAPP_USER = "navarro"
-#LAPP_USER = "pi"
-LAPP_OUTDIR = os.path.join(BASEDIR, "lapp_output/")
-LAPP_OUTFILE = os.path.join(LAPP_OUTDIR, "lapp.stdout")
-LAPP_LOGFILE = os.path.join(LAPP_OUTDIR, "lapp.log")
-LAPP_PIDFILE = os.path.join(LAPP_OUTDIR, "lapp.pid")
+# configuration module
+import config
 
 #-------------------------------------------------------------------------------
 # lapp API
@@ -73,14 +67,14 @@ class LampApp(object):
     def _check_create_outdir():
         """ check that lapps output dir exist (create it if needed)
         """
-        if not os.path.isdir(LAPP_OUTDIR):
-            os.makedirs(LAPP_OUTDIR)
+        if not os.path.isdir(config.LAPP_OUTDIR):
+            os.makedirs(config.LAPP_OUTDIR)
 
     @staticmethod
     def lapps_list():
         """ return the list of existing lapps
         """
-        lapp_list = glob.glob("%s/*.info" % LAPP_DIR)
+        lapp_list = glob.glob("%s/*.info" % config.LAPP_DIR)
         bname = os.path.basename
         splitext = os.path.splitext
         lapp_list = [splitext(bname(lapp_filename))[0] \
@@ -172,19 +166,19 @@ class LampApp(object):
     def info_filename(self):
         """ Get the filename of the info file 
         """
-        return os.path.join(LAPP_DIR, self.name + ".info")
+        return os.path.join(config.LAPP_DIR, self.name + ".info")
 
     @property
     def python_filename(self):
         """ Get the python script filename
         """
-        return os.path.join(LAPP_DIR, self.name + ".py")
+        return os.path.join(config.LAPP_DIR, self.name + ".py")
 
     @property
     def blockly_filename(self):
         """ Get the blockly script filename
         """
-        return os.path.join(LAPP_DIR, self.name + ".by")
+        return os.path.join(config.LAPP_DIR, self.name + ".by")
 
     def exist(self):
         """ check wheter a lamp app exist or not
@@ -252,20 +246,20 @@ class LampApp(object):
         # check output dir exist (create it if needed)
         LampApp._check_create_outdir()
         # check nothing running
-        lapp_info = read_lapp_pidfile(LAPP_PIDFILE)
+        lapp_info = read_lapp_pidfile(config.LAPP_PIDFILE)
         if lapp_info is not None:
             raise LappRunning(lapp_info)
         # start daemon
         cmd = ["start-stop-daemon", "--start"]
         cmd += ["--background"] #comment it for debug
-        cmd += ["--pidfile", LAPP_PIDFILE]
+        cmd += ["--pidfile", config.LAPP_PIDFILE]
         cmd += ["--exec", "/usr/bin/python"]
-        cmd += ["--user", "%s" % LAPP_USER]
-        cmd += ["--chdir", "%s" % BASEDIR]
+        cmd += ["--user", "%s" % config.LAPP_USER]
+        cmd += ["--chdir", "%s" % config.BASEDIR]
         cmd += ["--", "%s" % self.python_filename]
-        cmd += ["--pidfile", "%s" % LAPP_PIDFILE]
-        cmd += ["--outfile", "%s" % LAPP_OUTFILE]
-        cmd += ["--logfile", "%s" % LAPP_LOGFILE]
+        cmd += ["--pidfile", "%s" % config.LAPP_PIDFILE]
+        cmd += ["--outfile", "%s" % config.LAPP_OUTFILE]
+        cmd += ["--logfile", "%s" % config.LAPP_LOGFILE]
         #print(cmd)
         #print(" ".join(cmd))
         # setup python path
@@ -291,12 +285,12 @@ class LampApp(object):
         """ stiop the lapp (if running)
         """
         # check nothing running
-        lapp_info = read_lapp_pidfile(LAPP_PIDFILE)
+        lapp_info = read_lapp_pidfile(config.LAPP_PIDFILE)
         if lapp_info is None:
             raise LappNotRunning()
         # stop the lapp daemon
         cmd = ["start-stop-daemon", "--stop"]
-        cmd += ["--pidfile", LAPP_PIDFILE]
+        cmd += ["--pidfile", config.LAPP_PIDFILE]
         #print(cmd)
         #print(" ".join(cmd))
         proc = subprocess.Popen(
@@ -379,7 +373,7 @@ def get_lapp_status():
     """
     output = {}
     output["status"] = "stopped"
-    lappinfo = read_lapp_pidfile(LAPP_PIDFILE)
+    lappinfo = read_lapp_pidfile(config.LAPP_PIDFILE)
     output["hash"] = hash(str(lappinfo))
     if lappinfo is not None:
         output.update(lappinfo)

@@ -32,13 +32,13 @@ def every():
 @app.wiimote.pressed(BTN_A)
 def pressed_a():
     global couleur
-    couleur = Color(0, 255, 0)
+    couleur = Color(0, 255, 0) # vert
 
 
 @app.wiimote.released(BTN_A)
 def released_a():
     global couleur
-    couleur = Color(255, 0, 0)
+    couleur = Color(255, 0, 0) # rouge
 
 if __name__ == "__main__":
     app.run()
