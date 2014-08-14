@@ -107,12 +107,14 @@ class LampApp(object):
         """
         with open(self.python_filename, "r") as pyfile:
             py_code = pyfile.read()
-        return py_code
+        return py_code.decode("utf8")
 
     @py_code.setter
     def py_code(self, py_code):
         """ writes a new version of the python code of the lapp
         """
+        if isinstance(py_code, unicode):
+            py_code = py_code.encode("utf8")
         with open(self.python_filename, "w") as pyfile:
             pyfile.write(py_code)
 
@@ -261,7 +263,7 @@ class LampApp(object):
         cmd += ["--outfile", "%s" % config.LAPP_OUTFILE]
         cmd += ["--logfile", "%s" % config.LAPP_LOGFILE]
         #print(cmd)
-        #print(" ".join(cmd))
+        print(" ".join(cmd))
         # setup python path
         varenv = os.environ.copy()
         varenv["PYTHONPATH"] = varenv.get("PYTHONPATH", "") + ":./"
@@ -276,7 +278,7 @@ class LampApp(object):
         print output
         print error
         retcode = proc.poll()
-        print retcode
+        print "Runned with retcode: %d " % retcode
         if retcode != 0:
             raise RuntimeError(error)
 

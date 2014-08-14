@@ -3,6 +3,7 @@ from lampapp import LampApp
 from ledpixels import Color
 
 app = LampApp()
+app.need("lamp")
 
 @app.setup()
 def setup():
@@ -36,7 +37,7 @@ def loop():
         if count % period[k] == 0:
             if position[k] == 1:
                 sens[k] = 1
-            elif position[k] == 25+32:
+            elif position[k] == app.lamp.nb_pixel:
                 sens[k] = -1
             position[k] += sens[k]    
 

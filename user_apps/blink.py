@@ -9,21 +9,13 @@ app.need("bp_rouge")
 app.need("sw_band")
 app.need("volume")
 
-# variables
-color_off = None
-color_on = None
-volume = None
-
 @app.setup()
 def setup():
-    global color_on
-    global color_off
-    global volume
-
     update_and_draw()
 
-    while True:
-        app.wait(1)
+@app.every(1)
+def loop():
+    pass
 
 @app.bp_rouge.change()
 def bp_route_changed():
@@ -38,12 +30,8 @@ def volume_changed():
     update_and_draw()
 
 def update_and_draw():
-    global color_on
-    global color_off
-    global volume
-
     volume = app.volume.value
-    app.gauge.value = volume
+    app.gauge.value = 900-volume
 
     if app.sw_band.value:
         color_off = Color(40, 40, 40)

@@ -151,10 +151,10 @@ class LedPixelsAbstract(BBLampHardware):
         self.is_on = [True for _ in xrange(self.nb_pixel)]
 
     def activate(self, app):
-        self.off()
+        self.turn_off()
 
     def exit(self, app):
-        self.off()
+        self.turn_off()
 
     @property
     def nb_pixel(self):

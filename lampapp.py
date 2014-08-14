@@ -44,31 +44,9 @@ class LampApp(object):
             hardware.activate(self)
 
     def _exit(self):
-        for attr, hardware in self._hardware.iteritems:
+        for attr, hardware in self._hardware.iteritems():
             hardware.exit(self)
         sys.exit()
-
-    def activate_wiimote(self):
-        """ make wiimote available
-        """
-        from wiimote import Wiimote, WiimoteError
-        self.wiimote = Wiimote()
-        def check_reconnect():
-            connected = False
-            while True:
-                # connect the wiimote
-                if not self.wiimote.connected():
-                    try:
-                        self.log.info("Connecting to WiiMote...")
-                        self.wiimote.connect()
-                        self.wait(0.4)
-                        self.log.info("Connected to WiiMote !")
-                    except WiimoteError:
-                        self.log.info("Connection to WiiMote failed !")
-                        self.wait(0.2)
-                else:
-                    self.wait(0.4)
-        self._to_spawn.append(check_reconnect)
 
     def setup(self):
         """ Function decorator to declare an function to be run at start up
@@ -104,7 +82,6 @@ class LampApp(object):
 
     def wait(self, time):
         gevent.sleep(time)
-
 
     def _run_log(self, fn):
         """ Run a fct and log exception (if any)
@@ -186,6 +163,4 @@ class LampApp(object):
             self.log.exception("uncaught exception:")
             raise
         finally:
-            #
-            pass
-
+            self._exit()

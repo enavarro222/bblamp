@@ -4,9 +4,11 @@ from random import randint, gauss
 from colorsys import hls_to_rgb
 
 from lampapp import LampApp
-from lampapp.ledpixels import Color
+from hardware.lamp import Color #FIXME odd import..
 
 app = LampApp()
+app.need("lamp")
+app.need("volume")
 
 def randColor(light, sat, mu=0.3, sigma=0.06):
     hue = gauss(mu, sigma)
@@ -31,7 +33,8 @@ def setup():
 def loop():
     global on, count, saturation, light, colors
 
-    count += 1
+    #count += 1
+    count = app.volume.value
     app.lamp.turn_on(flush=False)
     
     mu = (count / 900.) % 1
