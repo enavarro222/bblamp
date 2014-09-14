@@ -154,6 +154,7 @@ Lamp app or a "lapp"
 ------------------
 
 #### some requirements:
+
 * autonomous python program (only depends on "lampapp" module)
 * could be written using blockly
 * only one running at a time
@@ -166,6 +167,7 @@ Lamp app or a "lapp"
 
 
 #### Exemple:
+
 ```python
 #-*- coding:utf-8 -*-
 from lampapp import LampApp
@@ -254,7 +256,7 @@ BBLampHardware = {
         ''
     }
 }
-
+```
 
 hardware :
 * a python class
@@ -297,6 +299,12 @@ lapp web editor/manager
 * no "database": all metadata are in a .info file
 * stdout/stderr/status are redirected in files in the dir : "lapp_out"
 
+
+Similar projects:
+--------------
+
+* WeIO : https://www.indiegogo.com/projects/weio-platform-for-web-of-things
+* gigabryte : http://www.gigabryte.com/
 
 
 TODO
