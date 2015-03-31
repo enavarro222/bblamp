@@ -15,7 +15,6 @@ class BBLampHardware(object):
         pass
 
 
-import smbus
 import struct
 
 # some i2c helper
@@ -61,6 +60,7 @@ class I2CBus(object):
         bytes = [value >> i & 0xff for i in range(24, -1, -8)]
         bytes.reverse()
         self._write_i2c(cmd, bytes)
+
 
 class I2CBusPigpio(I2CBus):
 

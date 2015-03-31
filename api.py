@@ -255,7 +255,7 @@ class LampApp(object):
         cmd = ["start-stop-daemon", "--start"]
         cmd += ["--background"] #comment it for debug
         cmd += ["--pidfile", config.LAPP_PIDFILE]
-        cmd += ["--exec", "/usr/bin/python"]
+        cmd += ["--exec", config.LAPP_PYTHON]
         cmd += ["--user", "%s" % config.LAPP_USER]
         cmd += ["--chdir", "%s" % config.BASEDIR]
         cmd += ["--", "%s" % self.python_filename]

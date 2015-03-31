@@ -4,66 +4,23 @@ from hardware.lamp import Color #FIXME odd import..
 
 app = LampApp()
 app.need("lamp")
-app.need("gauge")
-app.need("bp_rouge")
-app.need("sw_band")
-app.need("volume")
 
 @app.setup()
 def setup():
-    update_and_draw()
+    app.lamp.turn_on(20, Color.from_html('#009900'))
+    app.lamp.turn_on(18, Color.from_html('#cc0000'))
+
+
+on = True
 
 @app.every(1)
 def loop():
-    pass
-
-@app.bp_rouge.change()
-def bp_route_changed():
-    update_and_draw()
-
-@app.sw_band.change()
-def sw_band_changed():
-    update_and_draw()
-
-@app.volume.change()
-def volume_changed():
-    update_and_draw()
-
-def update_and_draw():
-    volume = app.volume.value
-    app.gauge.value = 900-volume
-
-    if app.sw_band.value:
-        color_off = Color(40, 40, 40)
+    global on
+    if on:
+        app.lamp.turn_off(18)
     else:
-        color_off = None
-
-    if app.bp_rouge.value:
-        color_on = Color(255, 20, 20)
-    else:
-        color_on = Color(10, 220, 100)
-
-
-    nb_on = max(1, (app.lamp.nb_pixel * volume) / 845)
-    print color_on, color_off, volume, nb_on
-
-    #set colors
-    for led in range(1, nb_on):
-        if color_on is not None:
-            app.lamp.set_color(led, color_on)
-    for led in range(app.lamp.nb_pixel, nb_on-1, -1):
-        if color_off is not None:
-            app.lamp.set_color(led, color_off)
-
-    for led in range(1, nb_on):
-        app.lamp.on(led)
-    for led in range(app.lamp.nb_pixel, nb_on-1, -1):
-        if color_off is not None:
-            app.lamp.on(led)
-        else:
-            app.lamp.off(led)
-    app.lamp.flush()
-
-
+        app.lamp.turn_on(18, Color.from_html('#cc0000'))
+    on = not on
+    
 if __name__ == "__main__":
     app.run()
