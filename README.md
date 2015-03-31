@@ -14,17 +14,20 @@ This project is very young but in (active) development. Feel free to contact me 
 Installation
 -----------
 
+    $ git clone https://github.com/enavarro222/bblamp.git
+    $ cd bblamp
+
 install depencies:
 
     $ sudo apt-get install python-pip python-dev
-    $ sudo pip insall gevent  # need gevent >= 1.0
-    $ sudo pip insall flask
-    $ sudo pip insall requests
+    $ virtualenv venv
+    $ source venv/bin/activate
+    $ pip insall gevent  # need gevent >= 1.0
+    $ pip insall flask
+    $ pip insall requests
 
 Note: python-dev are needed to install gevent.
 
-    $ git clone https://github.com/enavarro222/bblamp.git
-    $ cd bblamp
     $ make get-ace
     $ make install-ace
     $ make get-bootstrap
@@ -113,6 +116,18 @@ The BBLamp software is organise in three parts :
  - written in python (with Flask)
 
 
+All important python code is mainly at root level :
+
+    .
+    ├── api.py          # flask API to manage lapps
+    ├── lampapp.py      # main class to create a BBlamp application (depend on config.py an then on hardware)
+    ├── *config.py*     # configuration of available hardware
+    ├── errors.py       # common lapps management errors
+    ├── simulate.py     # lamp hardware simulator API
+    ├── utils.py        # some helpers
+    └── webserver.py    # webserer main program
+
+
 The main directories are:
 
     .
@@ -124,7 +139,7 @@ The main directories are:
     │   ├── ...
     │   ├── msg         # contains blockly i18n files
     │   └── ...
-    ├── lampapp         # python files for lamp app creation, hardware drivers
+    ├── hardware        # python files for hardware drivers
     ├── lapp_output     # contains lamp app outputs file (used to communicate with the webserver)
     ├── static          # webapp static files
     │   ├── blockly -> ../blockly # link to blockly
@@ -133,21 +148,6 @@ The main directories are:
     ├── templates       # web app templates (flask templates)
     ├── tests           # ...
     └── user_apps       # contains application created by users
-
-
-The web server python code is mainly at root level :
-
-    .
-    ├── api.py          # flask API to manage lapps
-    ├── errors.py       # common lapps management errors
-    ├── simulate.py     # lamp hardware simulator API
-    ├── static          # static files (ie JS edition app)
-    ├── templates       # templates, ie JS edition app main page
-    ├── utils.py        # some helpers
-    └── webserver.py    # webserer main program
-
-The lapp are based on python modules that are in "lampapp" :
-TODO: description of these files 
 
 
 Lamp app or a "lapp"
@@ -195,37 +195,25 @@ if __name__ == "__main__":
     app.run()
 ```
 
-### Hardware managment
+Hardware managment
+------------------
 
-* declare/get "what" is used by a lapp
-* declare/get "what" is availble
+#### some requirements:
+
+* declare/get "what" is used by an application
+* declare/get "what" is availble (depending on each install)
 * (lapp) activate an hardware module
 * (ui) load blocks for an hardware module
 * (webserer) check if a app may be run or not (hardware available)
-* configure hardware (number of led)
+* configure hardware (ex: number of led)
 * switch between different hardware (simulation or not)
 * user (app) declare what a need (class name)
 * root declare available class
 
 
-* abstract class : BBLampHarware
- - default attribute name ('lamp', 'wiimote', ...)
-* app.need("WiMote")
- - activate the 
-* "python ./mylapp.py --list-hardware"
+#### Specify needed hardware for an application:
 
-```python
-#-*- coding:utf-8 -*-
-from lampapp import LampApp
-
-app = LampApp()
-
-# manualy load an hardware driver
-from lampapp.ledpixels import LedPixels
-app.load("lamp", LedPixels(nb_pixel=32))
-
-app.lamp.on()
-```
+An application require some hardware with : app.need("hardware_name"), ex:
 
 ```python
 #-*- coding:utf-8 -*-
@@ -238,30 +226,39 @@ app.need("lamp")
 app.lamp.on()
 ```
 
-hardware.conf
-```
-[lamp]
-driver=lampapp.ledpixels.LedPixels
-nb_pixel=25
-```
+Note: it is possible to list all needed hardware of a application:
 
-hardware.json
+    $ python ./my_application.py --list-hardware"
+
+
+#### Specify (and configure) available hardware on a specific installation:
+
+All is in config.py, ex:
+
+config.py
 ```
-BBLampHardware = {
-    'lamp': {
-        'driver':'lampapp.ledpixels.LedPixels',
-        'options':{
-            'nb_pixel': 25
-        },
-        ''
-    }
+from hardware.lamp import LedPixels
+from hardware.ar_i2c import ArI2C, ArBpRouge, ArSwBand, ArSwFct, ArVolume
+from hardware.ar_i2c import ArGauge
+
+# declaration of available hardware
+hardware = {
+    "lamp": LedPixels(32),
+    "gauge": ArGauge(),
+    "bp_rouge": ArBpRouge(),
+    "sw_band": ArSwBand(),
+    "volume": ArVolume(),
+    "sw_fct": ArSwFct(),
 }
 ```
 
-hardware :
-* a python class
-* some blocks
-* simulation view, server code ?
+#### Create a spécific hardware driver:
+
+TODO
+
+inheritage of abstract class : BBLampHarware, with some  default attribute name ('lamp', 'wiimote', ...)
+
+
 
 
 BBLamp custom blocks
